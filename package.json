@@ -1,0 +1,31 @@
+{
+  "name": "activity-analyzer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stranger-johnny/activity-analyzer.git"
+  },
+  "keywords": [],
+  "author": "stranger-johnny",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stranger-johnny/activity-analyzer/issues"
+  },
+  "homepage": "https://github.com/stranger-johnny/activity-analyzer#readme",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
