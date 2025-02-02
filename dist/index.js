@@ -2,6 +2,72 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 530:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.collectPulls = void 0;
+const pulls_model_1 = __nccwpck_require__(104);
+const collectPulls = async (octokit, owner, repo) => {
+    const client = await new pulls_model_1.PullsClient(octokit, owner, repo);
+    const pulls = await client.collect();
+    return pulls;
+};
+exports.collectPulls = collectPulls;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ 104:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Pulls = exports.PullsClient = void 0;
+class PullsClient {
+    constructor(octokit, owner, repo) {
+        this.octokit = octokit;
+        this.owner = owner;
+        this.repo = repo;
+    }
+    async collect() {
+        const now = new Date();
+        const oneWeekAgo = new Date(now);
+        oneWeekAgo.setDate(now.getDate() - 7);
+        return await this.octokit.paginate(this.octokit.rest.pulls.list, {
+            owner: this.owner,
+            repo: this.repo,
+            state: 'all',
+            per_page: 100,
+        });
+    }
+}
+exports.PullsClient = PullsClient;
+class Pulls {
+    constructor(pulls) {
+        this.pulls = pulls;
+    }
+    filter(start, end) {
+        const filtered = this.pulls.filter((pull) => {
+            const createdAt = new Date(pull.created_at);
+            if (createdAt >= start && createdAt <= end) {
+                return true;
+            }
+            if (pull.closed_at) {
+                const closedAt = new Date(pull.closed_at);
+                return closedAt >= start && closedAt <= end;
+            }
+            return false;
+        });
+        return new Pulls(filtered);
+    }
+}
+exports.Pulls = Pulls;
+//# sourceMappingURL=pulls_model.js.map
+
+/***/ }),
+
 /***/ 120:
 /***/ ((module) => {
 
@@ -3979,6 +4045,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const rest_1 = __nccwpck_require__(643);
+const pulls_1 = __nccwpck_require__(530);
 const token = process.env.GITHUB_TOKEN;
 if (!token) {
     console.error('GITHUB_TOKEN is required');
@@ -3986,16 +4053,17 @@ if (!token) {
 }
 const octokit = new rest_1.Octokit({ auth: token });
 async function getPrsAverageTime(owner, repo) {
-    const now = new Date();
-    const oneWeekAgo = new Date(now);
-    oneWeekAgo.setDate(now.getDate() - 7);
-    const prs = await octokit.paginate(
-    /* octokit.rest.pulls.list */ `GET /repos/${owner}/${repo}/pulls`, {
-        owner,
-        repo,
-        per_page: 100,
-    });
-    console.log(prs);
+    const pulls = (0, pulls_1.collectPulls)(octokit, owner, repo);
+    console.log(pulls);
+    // const now = new Date()
+    // const oneWeekAgo = new Date(now)
+    // oneWeekAgo.setDate(now.getDate() - 7)
+    // const prs = await octokit.paginate(octokit.rest.pulls.list, {
+    //   owner,
+    //   repo,
+    //   per_page: 100,
+    // })
+    // console.log(prs)
     // const filteredPrs = prs.filter((pr) => {
     //   const createdAt = new Date(pr.created_at)
     //   return createdAt >= oneWeekAgo && pr.closed_at
