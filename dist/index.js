@@ -4105,6 +4105,12 @@ async function getPrsAverageTime(owner, repo) {
     const pulls = await (0, pulls_1.collectPulls)(octokit, owner, repo);
     console.log(pulls.values);
     console.log('closed pulls', pulls.closed);
+    await octokit.issues.create({
+        owner: owner,
+        repo: repo,
+        title: 'test',
+        body: 'issueが作れるかのテスト',
+    });
 }
 getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error);
 //# sourceMappingURL=index.js.map
