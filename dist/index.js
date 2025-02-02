@@ -18151,7 +18151,8 @@ class ClosedPullsAnalyzer extends PullsAnalyzer {
     }
     closedTimeAverage() {
         const totalClosedTime = (0, lodash_1.sumBy)(this.pulls, (pull) => {
-            console.log(pull.closed_at, pull.created_at);
+            console.log(pull.closed_at, pull.created_at, new Date(pull.closed_at).getTime() -
+                new Date(pull.created_at).getTime());
             return (new Date(pull.closed_at).getTime() -
                 new Date(pull.created_at).getTime());
         });
