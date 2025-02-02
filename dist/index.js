@@ -8,18 +8,67 @@
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.collectPulls = void 0;
-const pulls_model_1 = __nccwpck_require__(104);
+const pulls_client_1 = __nccwpck_require__(380);
+const pulls_analyzer_1 = __nccwpck_require__(597);
 const collectPulls = async (octokit, owner, repo) => {
-    const client = await new pulls_model_1.PullsClient(octokit, owner, repo);
+    const client = await new pulls_client_1.PullsClient(octokit, owner, repo);
     const pulls = await client.collect();
-    return pulls;
+    const analyzer = new pulls_analyzer_1.PullsAnalyzer(pulls);
+    return {
+        values: pulls,
+        closed: analyzer.closedWithinThePeriod(new Date(2025, 1, 1), new Date(2025, 3, 2)),
+    };
 };
 exports.collectPulls = collectPulls;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
 
-/***/ 104:
+/***/ 597:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PullsAnalyzer = void 0;
+class PullsAnalyzer {
+    constructor(pulls) {
+        this.pulls = pulls;
+    }
+    values() {
+        return this.pulls;
+    }
+    count() {
+        return this.pulls.length;
+    }
+    filter(start, end) {
+        const filtered = this.pulls.filter((pull) => {
+            const createdAt = new Date(pull.created_at);
+            if (createdAt >= start && createdAt <= end) {
+                return true;
+            }
+            if (pull.closed_at) {
+                const closedAt = new Date(pull.closed_at);
+                return closedAt >= start && closedAt <= end;
+            }
+            return false;
+        });
+        return new PullsAnalyzer(filtered);
+    }
+    closedWithinThePeriod(start, end) {
+        return this.pulls.filter((pull) => {
+            if (!pull.closed_at)
+                return false;
+            const closedAt = new Date(pull.closed_at);
+            return closedAt >= start && closedAt <= end;
+        });
+    }
+}
+exports.PullsAnalyzer = PullsAnalyzer;
+
+
+/***/ }),
+
+/***/ 380:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -64,7 +113,7 @@ class Pulls {
     }
 }
 exports.Pulls = Pulls;
-//# sourceMappingURL=pulls_model.js.map
+
 
 /***/ }),
 
@@ -4054,32 +4103,8 @@ if (!token) {
 const octokit = new rest_1.Octokit({ auth: token });
 async function getPrsAverageTime(owner, repo) {
     const pulls = await (0, pulls_1.collectPulls)(octokit, owner, repo);
-    console.log(pulls);
-    // const now = new Date()
-    // const oneWeekAgo = new Date(now)
-    // oneWeekAgo.setDate(now.getDate() - 7)
-    // const prs = await octokit.paginate(octokit.rest.pulls.list, {
-    //   owner,
-    //   repo,
-    //   per_page: 100,
-    // })
-    // console.log(prs)
-    // const filteredPrs = prs.filter((pr) => {
-    //   const createdAt = new Date(pr.created_at)
-    //   return createdAt >= oneWeekAgo && pr.closed_at
-    // })
-    // if (filteredPrs.length === 0) {
-    //   console.log('No PRs closed in the last week.')
-    //   return
-    // }
-    // const totalTime = filteredPrs.reduce((acc, pr) => {
-    //   const createdAt = new Date(pr.created_at).getTime()
-    //   const closedAt = new Date(pr.closed_at!).getTime()
-    //   return acc + (closedAt - createdAt)
-    // }, 0)
-    // const averageTimeMs = totalTime / filteredPrs.length
-    // const averageTimeHours = averageTimeMs / (1000 * 60 * 60)
-    // console.log(`Average PR open time: ${averageTimeHours.toFixed(2)} hours`)
+    console.log(pulls.values);
+    console.log('closed pulls', pulls.closed);
 }
 getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error);
 //# sourceMappingURL=index.js.map

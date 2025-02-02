@@ -1,7 +1,5 @@
 import { Octokit } from '@octokit/rest'
-import { components } from '@octokit/openapi-types/types'
-
-export type Pull = components['schemas']['pull-request-simple']
+import { Pull } from '@/types'
 
 export class PullsClient {
   constructor(
