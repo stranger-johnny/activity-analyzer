@@ -1,0 +1,7 @@
+name: Activity Analyzer
+description: Analyze the activity of the repository.
+inputs:
+outputs:
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
