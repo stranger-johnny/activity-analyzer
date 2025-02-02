@@ -3,7 +3,7 @@ import { PullsClient } from '@/pulls/pulls_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Pull } from '@/types'
 
-type CollectPullsResponse = {
+export type CollectPullsResponse = {
   values: Pull[]
   closed: Pull[]
 }
