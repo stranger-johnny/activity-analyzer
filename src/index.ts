@@ -20,6 +20,8 @@ async function getPrsAverageTime(owner: string, repo: string) {
     per_page: 100,
   })
 
+  console.log(prs)
+
   const filteredPrs = prs.filter((pr) => {
     const createdAt = new Date(pr.created_at)
     return createdAt >= oneWeekAgo && pr.closed_at
