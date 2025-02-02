@@ -18156,8 +18156,8 @@ class ClosedPullsAnalyzer extends PullsAnalyzer {
             return (new Date(pull.closed_at).getTime() -
                 new Date(pull.created_at).getTime());
         });
-        console.log(`totalClosedTime: ${totalClosedTime}`);
-        const avarageAsSeconds = totalClosedTime / this.pulls.length;
+        console.log(`totalClosedTime: ${Math.floor(totalClosedTime / 1000)}`);
+        const avarageAsSeconds = Math.floor(totalClosedTime / 1000) / this.pulls.length;
         const days = Math.floor(avarageAsSeconds / (24 * 60 * 60));
         const hours = Math.floor((avarageAsSeconds % (24 * 60 * 60)) / (60 * 60));
         const minutes = Math.floor((avarageAsSeconds % (60 * 60)) / 60);
