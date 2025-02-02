@@ -21,6 +21,8 @@ export class PullsClient {
       )
 
       console.log(
+        'page',
+        page,
         'curratePagePulls:',
         curratePagePulls.map((pull) => pull.title)
       )

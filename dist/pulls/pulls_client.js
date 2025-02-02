@@ -16,7 +16,7 @@ class PullsClient {
                 per_page: 2,
                 page: page,
             });
-            console.log('curratePagePulls:', curratePagePulls.map((pull) => pull.title));
+            console.log('page', page, 'curratePagePulls:', curratePagePulls.map((pull) => pull.title));
             if (curratePagePulls.length === 0) {
                 break;
             }
