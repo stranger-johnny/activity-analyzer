@@ -1,4 +1,12 @@
-"use strict";
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	/* webpack/runtime/compat */
+/******/ 	
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+
 // import { Octokit } from '@octokit/rest'
 // const token = process.env.GITHUB_TOKEN
 // if (!token) {
@@ -36,3 +44,6 @@
 // getPrsAverageTime('your-org', 'your-repo').catch(console.error)
 console.log('Hello My World!!');
 //# sourceMappingURL=index.js.map
+module.exports = __webpack_exports__;
+/******/ })()
+;
