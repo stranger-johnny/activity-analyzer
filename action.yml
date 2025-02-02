@@ -1,16 +1,5 @@
 name: My GitHub Action
 description: A simple GitHub Action written in TypeScript
-inputs:
-  who-to-greet:  # 必須入力
-    description: 'Who to greet'
-    required: true
-  who-to-wave: # 任意入力
-    description: 'Who to wave at'
-    required: false
-    default: 'everyone'
-outputs:
-  time: # 出力
-    description: 'The time we greeted someone'
 runs:
-  using: 'node16' # GitHub Actionsのrunnerイメージを指定
-  main: 'dist/index.js' # 実行するスクリプト
+  using: 'node16'
+  main: 'dist/index.js'
