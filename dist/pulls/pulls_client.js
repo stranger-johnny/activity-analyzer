@@ -13,7 +13,7 @@ class PullsClient {
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
                 state: 'all',
-                per_page: 1,
+                per_page: 2,
                 page: page,
             });
             console.log('curratePagePulls:', curratePagePulls.map((pull) => pull.title));
