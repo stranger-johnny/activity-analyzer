@@ -38,7 +38,6 @@ async function getPrsAverageTime(owner: string, repo: string) {
 
   const averageTimeMs = totalTime / filteredPrs.length
   const averageTimeHours = averageTimeMs / (1000 * 60 * 60)
-
   console.log(`Average PR open time: ${averageTimeHours.toFixed(2)} hours`)
 }
 
