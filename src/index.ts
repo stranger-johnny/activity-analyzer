@@ -6,6 +6,8 @@ if (!token) {
   process.exit(1)
 }
 
+console.log('GITHUB_TOKEN:', token)
+
 const octokit = new Octokit({ auth: token })
 
 async function getPrsAverageTime(owner: string, repo: string) {
