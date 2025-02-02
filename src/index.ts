@@ -10,7 +10,7 @@ if (!token) {
 const octokit = new Octokit({ auth: token })
 
 async function getPrsAverageTime(owner: string, repo: string) {
-  const pulls = collectPulls(octokit, owner, repo)
+  const pulls = await collectPulls(octokit, owner, repo)
   console.log(pulls)
   // const now = new Date()
   // const oneWeekAgo = new Date(now)
