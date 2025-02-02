@@ -16,7 +16,7 @@ async function getPrsAverageTime(owner: string, repo: string) {
   const prs = await octokit.paginate(octokit.rest.pulls.list, {
     owner,
     repo,
-    state: 'closed',
+    state: undefined,
     per_page: 100,
   })
 
