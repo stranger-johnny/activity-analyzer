@@ -18140,10 +18140,10 @@ class PullsAnalyzer {
     }
     filtedMerged(start, end) {
         const filtered = this.pulls.filter((pull) => {
-            if (!pull.closed_at)
+            if (!pull.merged_at)
                 return false;
-            const closedAt = new Date(pull.closed_at);
-            return closedAt >= start && closedAt <= end;
+            const mergedAt = new Date(pull.merged_at);
+            return mergedAt >= start && mergedAt <= end;
         });
         return new MergedPullsAnalyzer(filtered);
     }

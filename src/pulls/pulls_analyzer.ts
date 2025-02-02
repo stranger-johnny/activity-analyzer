@@ -15,9 +15,9 @@ export class PullsAnalyzer {
 
   public filtedMerged(start: Date, end: Date): MergedPullsAnalyzer {
     const filtered = this.pulls.filter((pull) => {
-      if (!pull.closed_at) return false
-      const closedAt = new Date(pull.closed_at)
-      return closedAt >= start && closedAt <= end
+      if (!pull.merged_at) return false
+      const mergedAt = new Date(pull.merged_at)
+      return mergedAt >= start && mergedAt <= end
     })
     return new MergedPullsAnalyzer(filtered)
   }
