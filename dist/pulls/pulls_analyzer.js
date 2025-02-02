@@ -25,15 +25,16 @@ class PullsAnalyzer {
 exports.PullsAnalyzer = PullsAnalyzer;
 class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls) {
-        super(pulls.sort((a, b) => (a.merged_at > b.merged_at ? 1 : -1)));
+        super(pulls);
     }
     pullsWithMergeTime() {
-        return this.pulls.map((pull) => {
+        const pulls = this.pulls.map((pull) => {
             const mergedAt = new Date(pull.merged_at).getTime();
             const createdAt = new Date(pull.created_at).getTime();
             const diff = mergedAt - createdAt;
             return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) };
         });
+        return pulls.sort((a, b) => a.minutesNeedToMerge - b.minutesNeedToMerge);
     }
     mergedTimeAverage() {
         const sumTime = (0, lodash_1.sumBy)(this.pullsWithMergeTime(), (pull) => {
@@ -50,9 +51,9 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         });
         return `
     xychart-beta
-      title "PR Merge Time"
+      title \"PR Merge Time\"
       x-axis [${pulls.map((pull) => pull.number).join(',')}]
-      y-axis "Merge Time (minutes)"
+      y-axis \"Merge Time (minutes)\"
       bar [${pulls.map((pull) => pull.hours).join(',')}]
     `;
     }
