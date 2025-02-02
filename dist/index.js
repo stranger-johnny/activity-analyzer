@@ -866,11 +866,11 @@ exports.Analyzed = Analyzed;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createGitHubClient = void 0;
 const rest_1 = __nccwpck_require__(643);
-const createGitHubClient = (gitHubToken, owner, repo) => {
+const createGitHubClient = (gitHubToken, repo) => {
     return {
         octokit: new rest_1.Octokit({ auth: gitHubToken }),
-        owner,
-        repo,
+        owner: repo.split('/')[0] ?? '',
+        repo: repo.split('/')[1] ?? '',
     };
 };
 exports.createGitHubClient = createGitHubClient;
@@ -4961,11 +4961,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const pulls_1 = __nccwpck_require__(600);
 const analyzed_1 = __nccwpck_require__(662);
 const github_client_1 = __nccwpck_require__(262);
-const owner = process.env.GITHUB_OWNER;
-if (!owner) {
-    console.error('GITHUB_OWNER is required');
-    process.exit(1);
-}
 const repo = process.env.GITHUB_REPOSITORY;
 if (!repo) {
     console.error('GITHUB_REPOSITORY is required');
@@ -4976,11 +4971,10 @@ if (!token) {
     console.error('GITHUB_TOKEN is required');
     process.exit(1);
 }
-console.log('owner:', owner);
 console.log('repo:', repo);
 console.log('token:', token);
 async function run() {
-    const client = (0, github_client_1.createGitHubClient)(token, owner, repo);
+    const client = (0, github_client_1.createGitHubClient)(token, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const analyzed = new analyzed_1.Analyzed(client, pulls);
     analyzed.convertAnalzedToIssue();

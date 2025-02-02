@@ -8,12 +8,11 @@ export type GitHubClient = {
 
 export const createGitHubClient = (
   gitHubToken: string,
-  owner: string,
   repo: string
 ): GitHubClient => {
   return {
     octokit: new Octokit({ auth: gitHubToken }),
-    owner,
-    repo,
+    owner: repo.split('/')[0] ?? '',
+    repo: repo.split('/')[1] ?? '',
   }
 }

@@ -4,4 +4,4 @@ export type GitHubClient = {
     owner: string;
     repo: string;
 };
-export declare const createGitHubClient: (gitHubToken: string, owner: string, repo: string) => GitHubClient;
+export declare const createGitHubClient: (gitHubToken: string, repo: string) => GitHubClient;

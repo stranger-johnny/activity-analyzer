@@ -2,12 +2,6 @@ import { listPulls } from '@/pulls'
 import { Analyzed } from '@/analyzed/analyzed'
 import { createGitHubClient } from '@/octokit/github_client'
 
-const owner = process.env.GITHUB_OWNER
-if (!owner) {
-  console.error('GITHUB_OWNER is required')
-  process.exit(1)
-}
-
 const repo = process.env.GITHUB_REPOSITORY
 if (!repo) {
   console.error('GITHUB_REPOSITORY is required')
@@ -20,12 +14,11 @@ if (!token) {
   process.exit(1)
 }
 
-console.log('owner:', owner)
 console.log('repo:', repo)
 console.log('token:', token)
 
 async function run() {
-  const client = createGitHubClient(token!, owner!, repo!)
+  const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 
   const analyzed = new Analyzed(client, pulls)
