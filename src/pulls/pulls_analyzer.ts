@@ -1,7 +1,9 @@
-import type { Pull } from '@/types'
+import type { Pull, Time } from '@/types'
+import { close } from 'fs'
+import { sumBy, sortBy } from 'lodash'
 
 export class PullsAnalyzer {
-  constructor(private pulls: Pull[]) {}
+  constructor(protected pulls: Pull[]) {}
 
   public values(): Pull[] {
     return this.pulls
@@ -11,26 +13,55 @@ export class PullsAnalyzer {
     return this.pulls.length
   }
 
-  public filter(start: Date, end: Date): PullsAnalyzer {
+  public filtedMerged(start: Date, end: Date): MergedPullsAnalyzer {
     const filtered = this.pulls.filter((pull) => {
-      const createdAt = new Date(pull.created_at)
-      if (createdAt >= start && createdAt <= end) {
-        return true
-      }
-      if (pull.closed_at) {
-        const closedAt = new Date(pull.closed_at)
-        return closedAt >= start && closedAt <= end
-      }
-      return false
+      if (!pull.merged_at) return false
+      const mergedAt = new Date(pull.merged_at)
+      return mergedAt >= start && mergedAt <= end
     })
-    return new PullsAnalyzer(filtered)
+    return new MergedPullsAnalyzer(filtered)
+  }
+}
+
+class MergedPullsAnalyzer extends PullsAnalyzer {
+  public constructor(pulls: Pull[]) {
+    super(pulls)
   }
 
-  public closedWithinThePeriod(start: Date, end: Date): Pull[] {
-    return this.pulls.filter((pull) => {
-      if (!pull.closed_at) return false
-      const closedAt = new Date(pull.closed_at)
-      return closedAt >= start && closedAt <= end
+  private pullsWithMergeTime(): (Pull & { minutesNeedToMerge: number })[] {
+    const pulls = this.pulls.map((pull) => {
+      const mergedAt = new Date(pull.merged_at!).getTime()
+      const createdAt = new Date(pull.created_at).getTime()
+      const diff = mergedAt - createdAt
+      return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) }
     })
+    return pulls.sort((a, b) => a.minutesNeedToMerge - b.minutesNeedToMerge)
+  }
+
+  public mergedTimeAverage(): Time {
+    const sumTime = sumBy(this.pullsWithMergeTime(), (pull) => {
+      return pull.minutesNeedToMerge
+    })
+    return this.secondsToTime(sumTime / this.pulls.length)
+  }
+
+  public mergedTimesPerPull(): { number: `#${number}`; hours: number }[] {
+    return this.pullsWithMergeTime().map((pull) => {
+      return {
+        number: `#${pull.number}`,
+        hours: this.secondsToHour(pull.minutesNeedToMerge),
+      }
+    })
+  }
+
+  private secondsToTime(seconds: number): Time {
+    const days = Math.floor(seconds / (24 * 60 * 60))
+    const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60))
+    const minutes = Math.floor((seconds % (60 * 60)) / 60)
+    return { days, hours, minutes }
+  }
+
+  private secondsToHour(seconds: number): number {
+    return seconds / (60 * 60)
   }
 }

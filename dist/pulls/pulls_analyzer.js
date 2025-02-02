@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PullsAnalyzer = void 0;
+const lodash_1 = require("lodash");
 class PullsAnalyzer {
     constructor(pulls) {
         this.pulls = pulls;
@@ -11,28 +12,52 @@ class PullsAnalyzer {
     count() {
         return this.pulls.length;
     }
-    filter(start, end) {
+    filtedMerged(start, end) {
         const filtered = this.pulls.filter((pull) => {
-            const createdAt = new Date(pull.created_at);
-            if (createdAt >= start && createdAt <= end) {
-                return true;
-            }
-            if (pull.closed_at) {
-                const closedAt = new Date(pull.closed_at);
-                return closedAt >= start && closedAt <= end;
-            }
-            return false;
-        });
-        return new PullsAnalyzer(filtered);
-    }
-    closedWithinThePeriod(start, end) {
-        return this.pulls.filter((pull) => {
-            if (!pull.closed_at)
+            if (!pull.merged_at)
                 return false;
-            const closedAt = new Date(pull.closed_at);
-            return closedAt >= start && closedAt <= end;
+            const mergedAt = new Date(pull.merged_at);
+            return mergedAt >= start && mergedAt <= end;
         });
+        return new MergedPullsAnalyzer(filtered);
     }
 }
 exports.PullsAnalyzer = PullsAnalyzer;
+class MergedPullsAnalyzer extends PullsAnalyzer {
+    constructor(pulls) {
+        super(pulls);
+    }
+    pullsWithMergeTime() {
+        const pulls = this.pulls.map((pull) => {
+            const mergedAt = new Date(pull.merged_at).getTime();
+            const createdAt = new Date(pull.created_at).getTime();
+            const diff = mergedAt - createdAt;
+            return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) };
+        });
+        return pulls.sort((a, b) => a.minutesNeedToMerge - b.minutesNeedToMerge);
+    }
+    mergedTimeAverage() {
+        const sumTime = (0, lodash_1.sumBy)(this.pullsWithMergeTime(), (pull) => {
+            return pull.minutesNeedToMerge;
+        });
+        return this.secondsToTime(sumTime / this.pulls.length);
+    }
+    mergedTimesPerPull() {
+        return this.pullsWithMergeTime().map((pull) => {
+            return {
+                number: `#${pull.number}`,
+                hours: this.secondsToHour(pull.minutesNeedToMerge),
+            };
+        });
+    }
+    secondsToTime(seconds) {
+        const days = Math.floor(seconds / (24 * 60 * 60));
+        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((seconds % (60 * 60)) / 60);
+        return { days, hours, minutes };
+    }
+    secondsToHour(seconds) {
+        return seconds / (60 * 60);
+    }
+}
 //# sourceMappingURL=pulls_analyzer.js.map

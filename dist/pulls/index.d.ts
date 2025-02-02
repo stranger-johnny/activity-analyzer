@@ -1,7 +1,3 @@
-import { Pull } from '@/types';
+import { PullsAnalyzer } from '@/pulls/pulls_analyzer';
 import { GitHubClient } from '@/octokit/github_client';
-export type CollectPullsResponse = {
-    values: Pull[];
-    closed: Pull[];
-};
-export declare const listPulls: (gitHubClient: GitHubClient) => Promise<CollectPullsResponse>;
+export declare const listPulls: (gitHubClient: GitHubClient) => Promise<PullsAnalyzer>;
