@@ -16,7 +16,6 @@
   "bugs": {
     "url": "https://github.com/stranger-johnny/activity-analyzer/issues"
   },
-  "type": "module",
   "settings": {
     "compilerOptions.module": "ESNext"
   },
