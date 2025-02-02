@@ -1,126 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 156:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Analyzed = void 0;
-const Mustache = __importStar(__nccwpck_require__(374));
-const fs = __importStar(__nccwpck_require__(896));
-class Analyzed {
-    constructor(gitHubClient, pulls) {
-        this.gitHubClient = gitHubClient;
-        this.pulls = pulls;
-        this.template = () => {
-            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
-        };
-        this.templateAttributes = () => {
-            return {
-                numberOfClosedIssues: this.pulls.closed.length,
-            };
-        };
-        this.convertToTemplate = () => {
-            return Mustache.render(this.template(), this.templateAttributes());
-        };
-        this.convertAnalzedToIssue = async () => {
-            try {
-                await this.gitHubClient.octokit.issues.create({
-                    owner: this.gitHubClient.owner,
-                    repo: this.gitHubClient.repo,
-                    title: 'Analyzed by issue template',
-                    body: this.convertToTemplate(),
-                });
-            }
-            catch (error) {
-                console.error('failed to create issue', error);
-            }
-        };
-    }
-}
-exports.Analyzed = Analyzed;
-//# sourceMappingURL=analyzed.js.map
-
-/***/ }),
-
-/***/ 804:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createGitHubClient = void 0;
-const rest_1 = __nccwpck_require__(643);
-const createGitHubClient = (gitHubToken, owner, repo) => {
-    return {
-        octokit: new rest_1.Octokit({ auth: gitHubToken }),
-        owner,
-        repo,
-    };
-};
-exports.createGitHubClient = createGitHubClient;
-//# sourceMappingURL=github_client.js.map
-
-/***/ }),
-
-/***/ 530:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.listPulls = void 0;
-const pulls_client_1 = __nccwpck_require__(380);
-const pulls_analyzer_1 = __nccwpck_require__(597);
-const listPulls = async (gitHubClient) => {
-    const client = await new pulls_client_1.PullsClient(gitHubClient);
-    const pulls = await client.collect();
-    const analyzer = new pulls_analyzer_1.PullsAnalyzer(pulls);
-    return {
-        values: pulls,
-        closed: analyzer.closedWithinThePeriod(new Date(2025, 1, 1), new Date(2025, 3, 2)),
-    };
-};
-exports.listPulls = listPulls;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
 /***/ 374:
 /***/ (function(module) {
 
@@ -895,6 +775,128 @@ exports.listPulls = listPulls;
   return mustache;
 
 })));
+
+
+/***/ }),
+
+/***/ 662:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Analyzed = void 0;
+const Mustache = __importStar(__nccwpck_require__(374));
+const fs = __importStar(__nccwpck_require__(896));
+class Analyzed {
+    constructor(gitHubClient, pulls) {
+        this.gitHubClient = gitHubClient;
+        this.pulls = pulls;
+        this.template = () => {
+            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
+        };
+        this.templateAttributes = () => {
+            return {
+                startDate: '2025-01-01',
+                endDate: '2025-03-02',
+                numberOfClosedIssues: this.pulls.closed.length,
+            };
+        };
+        this.convertToTemplate = () => {
+            return Mustache.render(this.template(), this.templateAttributes());
+        };
+        this.convertAnalzedToIssue = async () => {
+            try {
+                await this.gitHubClient.octokit.issues.create({
+                    owner: this.gitHubClient.owner,
+                    repo: this.gitHubClient.repo,
+                    title: 'Analyzed by issue template',
+                    body: this.convertToTemplate(),
+                });
+            }
+            catch (error) {
+                console.error('failed to create issue', error);
+            }
+        };
+    }
+}
+exports.Analyzed = Analyzed;
+
+
+/***/ }),
+
+/***/ 262:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createGitHubClient = void 0;
+const rest_1 = __nccwpck_require__(643);
+const createGitHubClient = (gitHubToken, owner, repo) => {
+    return {
+        octokit: new rest_1.Octokit({ auth: gitHubToken }),
+        owner,
+        repo,
+    };
+};
+exports.createGitHubClient = createGitHubClient;
+
+
+/***/ }),
+
+/***/ 600:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.listPulls = void 0;
+const pulls_client_1 = __nccwpck_require__(380);
+const pulls_analyzer_1 = __nccwpck_require__(597);
+const listPulls = async (gitHubClient) => {
+    const client = await new pulls_client_1.PullsClient(gitHubClient);
+    const pulls = await client.collect();
+    const analyzer = new pulls_analyzer_1.PullsAnalyzer(pulls);
+    return {
+        values: pulls,
+        closed: analyzer.closedWithinThePeriod(new Date(2025, 1, 1), new Date(2025, 3, 2)),
+    };
+};
+exports.listPulls = listPulls;
 
 
 /***/ }),
@@ -4956,23 +4958,36 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const rest_1 = __nccwpck_require__(643);
-const pulls_1 = __nccwpck_require__(530);
-const analyzed_1 = __nccwpck_require__(156);
-const github_client_1 = __nccwpck_require__(804);
+const pulls_1 = __nccwpck_require__(600);
+const analyzed_1 = __nccwpck_require__(662);
+const github_client_1 = __nccwpck_require__(262);
+const owner = process.env.GITHUB_OWNER;
+if (!owner) {
+    console.error('GITHUB_OWNER is required');
+    process.exit(1);
+}
+const repo = process.env.GitHUB_REPO;
+if (!repo) {
+    console.error('GitHUB_REPO is required');
+    process.exit(1);
+}
 const token = process.env.GITHUB_TOKEN;
 if (!token) {
     console.error('GITHUB_TOKEN is required');
     process.exit(1);
 }
-const octokit = new rest_1.Octokit({ auth: token });
-async function run(owner, repo) {
+async function run() {
     const client = (0, github_client_1.createGitHubClient)(token, owner, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const analyzed = new analyzed_1.Analyzed(client, pulls);
     analyzed.convertAnalzedToIssue();
 }
-run('stranger-johnny', 'activity-analyzer').catch(console.error);
+try {
+    run();
+}
+catch (error) {
+    console.error(error);
+}
 //# sourceMappingURL=index.js.map
 })();
 

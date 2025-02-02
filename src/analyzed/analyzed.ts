@@ -4,6 +4,8 @@ import * as fs from 'fs'
 import { GitHubClient } from '@/octokit/github_client'
 
 type AnalyzedTemplateAttributes = {
+  startDate: string
+  endDate: string
   numberOfClosedIssues: number
 }
 
@@ -19,6 +21,8 @@ export class Analyzed {
 
   private templateAttributes = (): AnalyzedTemplateAttributes => {
     return {
+      startDate: '2025-01-01',
+      endDate: '2025-03-02',
       numberOfClosedIssues: this.pulls.closed.length,
     }
   }

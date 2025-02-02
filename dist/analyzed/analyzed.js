@@ -45,6 +45,8 @@ class Analyzed {
         };
         this.templateAttributes = () => {
             return {
+                startDate: '2025-01-01',
+                endDate: '2025-03-02',
                 numberOfClosedIssues: this.pulls.closed.length,
             };
         };
