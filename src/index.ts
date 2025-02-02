@@ -44,4 +44,4 @@ async function getPrsAverageTime(owner: string, repo: string) {
   console.log(`Average PR open time: ${averageTimeHours.toFixed(2)} hours`)
 }
 
-getPrsAverageTime('your-org', 'your-repo').catch(console.error)
+getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error)
