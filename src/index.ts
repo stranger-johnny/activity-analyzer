@@ -14,7 +14,7 @@ async function getPrsAverageTime(owner: string, repo: string) {
   oneWeekAgo.setDate(now.getDate() - 7)
 
   const prs = await octokit.paginate(
-    /* octokit.rest.pulls.list */ `GET /repos/${owner}/${repo}/pulls`,
+    /* `GET /repos/${owner}/${repo}/pulls` */ octokit.rest.pulls.list,
     {
       owner,
       repo,
@@ -24,26 +24,26 @@ async function getPrsAverageTime(owner: string, repo: string) {
 
   console.log(prs)
 
-  // const filteredPrs = prs.filter((pr) => {
-  //   const createdAt = new Date(pr.created_at)
-  //   return createdAt >= oneWeekAgo && pr.closed_at
-  // })
+  const filteredPrs = prs.filter((pr) => {
+    const createdAt = new Date(pr.created_at)
+    return createdAt >= oneWeekAgo && pr.closed_at
+  })
 
-  // if (filteredPrs.length === 0) {
-  //   console.log('No PRs closed in the last week.')
-  //   return
-  // }
+  if (filteredPrs.length === 0) {
+    console.log('No PRs closed in the last week.')
+    return
+  }
 
-  // const totalTime = filteredPrs.reduce((acc, pr) => {
-  //   const createdAt = new Date(pr.created_at).getTime()
-  //   const closedAt = new Date(pr.closed_at!).getTime()
-  //   return acc + (closedAt - createdAt)
-  // }, 0)
+  const totalTime = filteredPrs.reduce((acc, pr) => {
+    const createdAt = new Date(pr.created_at).getTime()
+    const closedAt = new Date(pr.closed_at!).getTime()
+    return acc + (closedAt - createdAt)
+  }, 0)
 
-  // const averageTimeMs = totalTime / filteredPrs.length
-  // const averageTimeHours = averageTimeMs / (1000 * 60 * 60)
+  const averageTimeMs = totalTime / filteredPrs.length
+  const averageTimeHours = averageTimeMs / (1000 * 60 * 60)
 
-  // console.log(`Average PR open time: ${averageTimeHours.toFixed(2)} hours`)
+  console.log(`Average PR open time: ${averageTimeHours.toFixed(2)} hours`)
 }
 
 getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error)
