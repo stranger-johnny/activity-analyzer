@@ -1,11 +1,9 @@
 import { CollectPullsResponse } from '@/pulls';
-import { Octokit } from '@octokit/rest';
+import { GitHubClient } from '@/octokit/github_client';
 export declare class Analyzed {
-    private octokit;
-    private owner;
-    private repo;
+    private gitHubClient;
     private pulls;
-    constructor(octokit: Octokit, owner: string, repo: string, pulls: CollectPullsResponse);
+    constructor(gitHubClient: GitHubClient, pulls: CollectPullsResponse);
     private template;
     private templateAttributes;
     private convertToTemplate;

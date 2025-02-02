@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/rest'
-import { collectPulls } from './pulls'
+import { listPulls } from './pulls'
 import { Analyzed } from './analyzed/analyzed'
+import { createGitHubClient } from './octokit/github_client'
 
 const token = process.env.GITHUB_TOKEN
 if (!token) {
@@ -11,9 +12,10 @@ if (!token) {
 const octokit = new Octokit({ auth: token })
 
 async function run(owner: string, repo: string) {
-  const pulls = await collectPulls(octokit, owner, repo)
+  const client = createGitHubClient(token!, owner, repo)
+  const pulls = await listPulls(client)
 
-  const analyzed = new Analyzed(octokit, owner, repo, pulls)
+  const analyzed = new Analyzed(client, pulls)
   analyzed.convertAnalzedToIssue()
 }
 

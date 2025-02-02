@@ -37,10 +37,8 @@ exports.Analyzed = void 0;
 const Mustache = __importStar(require("mustache"));
 const fs = __importStar(require("fs"));
 class Analyzed {
-    constructor(octokit, owner, repo, pulls) {
-        this.octokit = octokit;
-        this.owner = owner;
-        this.repo = repo;
+    constructor(gitHubClient, pulls) {
+        this.gitHubClient = gitHubClient;
         this.pulls = pulls;
         this.template = () => {
             return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
@@ -55,9 +53,9 @@ class Analyzed {
         };
         this.convertAnalzedToIssue = async () => {
             try {
-                await this.octokit.issues.create({
-                    owner: this.owner,
-                    repo: this.repo,
+                await this.gitHubClient.octokit.issues.create({
+                    owner: this.gitHubClient.owner,
+                    repo: this.gitHubClient.repo,
                     title: 'Analyzed by issue template',
                     body: this.convertToTemplate(),
                 });

@@ -44,10 +44,8 @@ exports.Analyzed = void 0;
 const Mustache = __importStar(__nccwpck_require__(374));
 const fs = __importStar(__nccwpck_require__(896));
 class Analyzed {
-    constructor(octokit, owner, repo, pulls) {
-        this.octokit = octokit;
-        this.owner = owner;
-        this.repo = repo;
+    constructor(gitHubClient, pulls) {
+        this.gitHubClient = gitHubClient;
         this.pulls = pulls;
         this.template = () => {
             return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
@@ -62,9 +60,9 @@ class Analyzed {
         };
         this.convertAnalzedToIssue = async () => {
             try {
-                await this.octokit.issues.create({
-                    owner: this.owner,
-                    repo: this.repo,
+                await this.gitHubClient.octokit.issues.create({
+                    owner: this.gitHubClient.owner,
+                    repo: this.gitHubClient.repo,
                     title: 'Analyzed by issue template',
                     body: this.convertToTemplate(),
                 });
@@ -80,17 +78,37 @@ exports.Analyzed = Analyzed;
 
 /***/ }),
 
+/***/ 804:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createGitHubClient = void 0;
+const rest_1 = __nccwpck_require__(643);
+const createGitHubClient = (gitHubToken, owner, repo) => {
+    return {
+        octokit: new rest_1.Octokit({ auth: gitHubToken }),
+        owner,
+        repo,
+    };
+};
+exports.createGitHubClient = createGitHubClient;
+//# sourceMappingURL=github_client.js.map
+
+/***/ }),
+
 /***/ 530:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.collectPulls = void 0;
+exports.listPulls = void 0;
 const pulls_client_1 = __nccwpck_require__(380);
 const pulls_analyzer_1 = __nccwpck_require__(597);
-const collectPulls = async (octokit, owner, repo) => {
-    const client = await new pulls_client_1.PullsClient(octokit, owner, repo);
+const listPulls = async (gitHubClient) => {
+    const client = await new pulls_client_1.PullsClient(gitHubClient);
     const pulls = await client.collect();
     const analyzer = new pulls_analyzer_1.PullsAnalyzer(pulls);
     return {
@@ -98,7 +116,7 @@ const collectPulls = async (octokit, owner, repo) => {
         closed: analyzer.closedWithinThePeriod(new Date(2025, 1, 1), new Date(2025, 3, 2)),
     };
 };
-exports.collectPulls = collectPulls;
+exports.listPulls = listPulls;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
@@ -932,46 +950,21 @@ exports.PullsAnalyzer = PullsAnalyzer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Pulls = exports.PullsClient = void 0;
+exports.PullsClient = void 0;
 class PullsClient {
-    constructor(octokit, owner, repo) {
-        this.octokit = octokit;
-        this.owner = owner;
-        this.repo = repo;
+    constructor(gitHubClient) {
+        this.gitHubClient = gitHubClient;
     }
     async collect() {
-        const now = new Date();
-        const oneWeekAgo = new Date(now);
-        oneWeekAgo.setDate(now.getDate() - 7);
-        return await this.octokit.paginate(this.octokit.rest.pulls.list, {
-            owner: this.owner,
-            repo: this.repo,
+        return await this.gitHubClient.octokit.paginate(this.gitHubClient.octokit.rest.pulls.list, {
+            owner: this.gitHubClient.owner,
+            repo: this.gitHubClient.repo,
             state: 'all',
             per_page: 100,
         });
     }
 }
 exports.PullsClient = PullsClient;
-class Pulls {
-    constructor(pulls) {
-        this.pulls = pulls;
-    }
-    filter(start, end) {
-        const filtered = this.pulls.filter((pull) => {
-            const createdAt = new Date(pull.created_at);
-            if (createdAt >= start && createdAt <= end) {
-                return true;
-            }
-            if (pull.closed_at) {
-                const closedAt = new Date(pull.closed_at);
-                return closedAt >= start && closedAt <= end;
-            }
-            return false;
-        });
-        return new Pulls(filtered);
-    }
-}
-exports.Pulls = Pulls;
 
 
 /***/ }),
@@ -4966,6 +4959,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const rest_1 = __nccwpck_require__(643);
 const pulls_1 = __nccwpck_require__(530);
 const analyzed_1 = __nccwpck_require__(156);
+const github_client_1 = __nccwpck_require__(804);
 const token = process.env.GITHUB_TOKEN;
 if (!token) {
     console.error('GITHUB_TOKEN is required');
@@ -4973,8 +4967,9 @@ if (!token) {
 }
 const octokit = new rest_1.Octokit({ auth: token });
 async function run(owner, repo) {
-    const pulls = await (0, pulls_1.collectPulls)(octokit, owner, repo);
-    const analyzed = new analyzed_1.Analyzed(octokit, owner, repo, pulls);
+    const client = (0, github_client_1.createGitHubClient)(token, owner, repo);
+    const pulls = await (0, pulls_1.listPulls)(client);
+    const analyzed = new analyzed_1.Analyzed(client, pulls);
     analyzed.convertAnalzedToIssue();
 }
 run('stranger-johnny', 'activity-analyzer').catch(console.error);

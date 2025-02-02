@@ -1,19 +1,17 @@
-import { Octokit } from '@octokit/rest'
 import { PullsClient } from '@/pulls/pulls_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Pull } from '@/types'
+import { GitHubClient } from '@/octokit/github_client'
 
 export type CollectPullsResponse = {
   values: Pull[]
   closed: Pull[]
 }
 
-export const collectPulls = async (
-  octokit: Octokit,
-  owner: string,
-  repo: string
+export const listPulls = async (
+  gitHubClient: GitHubClient
 ): Promise<CollectPullsResponse> => {
-  const client = await new PullsClient(octokit, owner, repo)
+  const client = await new PullsClient(gitHubClient)
   const pulls = await client.collect()
 
   const analyzer = new PullsAnalyzer(pulls)

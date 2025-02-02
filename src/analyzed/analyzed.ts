@@ -1,7 +1,7 @@
 import { CollectPullsResponse } from '@/pulls'
 import * as Mustache from 'mustache'
 import * as fs from 'fs'
-import { Octokit } from '@octokit/rest'
+import { GitHubClient } from '@/octokit/github_client'
 
 type AnalyzedTemplateAttributes = {
   numberOfClosedIssues: number
@@ -9,9 +9,7 @@ type AnalyzedTemplateAttributes = {
 
 export class Analyzed {
   public constructor(
-    private octokit: Octokit,
-    private owner: string,
-    private repo: string,
+    private gitHubClient: GitHubClient,
     private pulls: CollectPullsResponse
   ) {}
 
@@ -31,9 +29,9 @@ export class Analyzed {
 
   public convertAnalzedToIssue = async (): Promise<void> => {
     try {
-      await this.octokit.issues.create({
-        owner: this.owner,
-        repo: this.repo,
+      await this.gitHubClient.octokit.issues.create({
+        owner: this.gitHubClient.owner,
+        repo: this.gitHubClient.repo,
         title: 'Analyzed by issue template',
         body: this.convertToTemplate(),
       })
