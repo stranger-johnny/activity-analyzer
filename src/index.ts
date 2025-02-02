@@ -20,6 +20,10 @@ if (!token) {
   process.exit(1)
 }
 
+console.log('owner:', owner)
+console.log('repo:', repo)
+console.log('token:', token)
+
 async function run() {
   const client = createGitHubClient(token!, owner!, repo!)
   const pulls = await listPulls(client)

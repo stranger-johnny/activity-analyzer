@@ -4976,6 +4976,9 @@ if (!token) {
     console.error('GITHUB_TOKEN is required');
     process.exit(1);
 }
+console.log('owner:', owner);
+console.log('repo:', repo);
+console.log('token:', token);
 async function run() {
     const client = (0, github_client_1.createGitHubClient)(token, owner, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
