@@ -1,18 +1,19 @@
-import { CollectPullsResponse } from '@/pulls'
+// import { CollectPullsResponse } from '@/pulls' 
 import * as Mustache from 'mustache'
 import * as fs from 'fs'
 import { GitHubClient } from '@/octokit/github_client'
+import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 
-type AnalyzedTemplateAttributes = {
+type AnalyzedTemplateAttributes = { 
   startDate: string
-  endDate: string
-  numberOfClosedIssues: number
+  endDate: string 
+  numberOfClosedIssues: number 
 }
-
+    
 export class Analyzed {
-  public constructor(
+  public constructor(  
     private gitHubClient: GitHubClient,
-    private pulls: CollectPullsResponse
+    private pulls: PullsAnalyzer
   ) {}
 
   private template = (): string => {
@@ -26,7 +27,7 @@ export class Analyzed {
       numberOfClosedIssues: this.pulls.closed.length,
     }
   }
-
+  
   private convertToTemplate = (): string => {
     return Mustache.render(this.template(), this.templateAttributes())
   }

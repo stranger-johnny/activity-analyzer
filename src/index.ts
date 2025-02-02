@@ -15,7 +15,7 @@ if (!token) {
 }
 
 console.log('repo:', repo)
-console.log('token:', token)
+console.log('token:', token) 
 
 async function run() {
   const client = createGitHubClient(token!, repo!)
