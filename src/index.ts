@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/rest'
 import { collectPulls } from './pulls'
+import { Analyzed } from './analyzed/analyzed'
 
 const token = process.env.GITHUB_TOKEN
 if (!token) {
@@ -9,18 +10,11 @@ if (!token) {
 
 const octokit = new Octokit({ auth: token })
 
-async function getPrsAverageTime(owner: string, repo: string) {
+async function run(owner: string, repo: string) {
   const pulls = await collectPulls(octokit, owner, repo)
-  console.log(pulls.values)
 
-  console.log('closed pulls', pulls.closed)
-
-  await octokit.issues.create({
-    owner: owner,
-    repo: repo,
-    title: 'test',
-    body: 'issueが作れるかのテスト',
-  })
+  const analyzed = new Analyzed(octokit, owner, repo, pulls)
+  analyzed.convertAnalzedToIssue()
 }
 
-getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error)
+run('stranger-johnny', 'activity-analyzer').catch(console.error)
