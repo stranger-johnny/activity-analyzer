@@ -4,8 +4,8 @@ export declare class Analyzed {
     private gitHubClient;
     private pulls;
     constructor(gitHubClient: GitHubClient, pulls: PullsAnalyzer);
+    convertAnalzedToIssue: (start: Date, end: Date) => Promise<void>;
+    private convertToTemplate;
     private template;
     private templateAttributes;
-    private convertToTemplate;
-    convertAnalzedToIssue: () => Promise<void>;
 }

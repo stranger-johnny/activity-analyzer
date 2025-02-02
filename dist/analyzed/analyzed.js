@@ -34,38 +34,39 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Analyzed = void 0;
-// import { CollectPullsResponse } from '@/pulls' 
 const Mustache = __importStar(require("mustache"));
 const fs = __importStar(require("fs"));
 class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
-        this.template = () => {
-            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
-        };
-        this.templateAttributes = () => {
-            return {
-                startDate: '2025-01-01',
-                endDate: '2025-03-02',
-                numberOfClosedIssues: this.pulls.closed.length,
-            };
-        };
-        this.convertToTemplate = () => {
-            return Mustache.render(this.template(), this.templateAttributes());
-        };
-        this.convertAnalzedToIssue = async () => {
+        this.convertAnalzedToIssue = async (start, end) => {
             try {
                 await this.gitHubClient.octokit.issues.create({
                     owner: this.gitHubClient.owner,
                     repo: this.gitHubClient.repo,
                     title: 'Analyzed by issue template',
-                    body: this.convertToTemplate(),
+                    body: this.convertToTemplate(this.templateAttributes(start, end)),
                 });
             }
             catch (error) {
                 console.error('failed to create issue', error);
             }
+        };
+        this.convertToTemplate = (attributes) => {
+            return Mustache.render(this.template(), attributes);
+        };
+        this.template = () => {
+            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
+        };
+        this.templateAttributes = (start, end) => {
+            const closedIssues = this.pulls.filtedClosed(start, end);
+            return {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                numberOfClosedIssues: closedIssues.values().length,
+                closedIssueTimeAverage: closedIssues.closedTimeAverage(),
+            };
         };
     }
 }

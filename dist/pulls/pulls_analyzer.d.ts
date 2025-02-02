@@ -1,15 +1,17 @@
 import type { Pull } from '@/types';
 export declare class PullsAnalyzer {
-    private pulls;
+    protected pulls: Pull[];
     constructor(pulls: Pull[]);
     values(): Pull[];
     count(): number;
-    filter(start: Date, end: Date): PullsAnalyzer;
-    closed(start: Date, end: Date): PullsAnalyzer;
-    closedWithinThePeriod(start: Date, end: Date): Pull[];
-    closedAverage(start: Date, end: Date): {
+    filtedClosed(start: Date, end: Date): ClosedPullsAnalyzer;
+}
+declare class ClosedPullsAnalyzer extends PullsAnalyzer {
+    constructor(pulls: Pull[]);
+    closedTimeAverage(): {
         days: number;
         hours: number;
         minutes: number;
     };
 }
+export {};

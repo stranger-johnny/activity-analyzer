@@ -14,15 +14,12 @@ if (!token) {
   process.exit(1)
 }
 
-console.log('repo:', repo)
-console.log('token:', token) 
-
 async function run() {
   const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 
   const analyzed = new Analyzed(client, pulls)
-  analyzed.convertAnalzedToIssue()
+  analyzed.convertAnalzedToIssue(new Date('2025-01-01'), new Date('2025-12-31'))
 }
 
 try {

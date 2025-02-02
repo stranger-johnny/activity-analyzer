@@ -18036,38 +18036,39 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Analyzed = void 0;
-// import { CollectPullsResponse } from '@/pulls' 
 const Mustache = __importStar(__nccwpck_require__(374));
 const fs = __importStar(__nccwpck_require__(896));
 class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
-        this.template = () => {
-            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
-        };
-        this.templateAttributes = () => {
-            return {
-                startDate: '2025-01-01',
-                endDate: '2025-03-02',
-                numberOfClosedIssues: this.pulls.closed.length,
-            };
-        };
-        this.convertToTemplate = () => {
-            return Mustache.render(this.template(), this.templateAttributes());
-        };
-        this.convertAnalzedToIssue = async () => {
+        this.convertAnalzedToIssue = async (start, end) => {
             try {
                 await this.gitHubClient.octokit.issues.create({
                     owner: this.gitHubClient.owner,
                     repo: this.gitHubClient.repo,
                     title: 'Analyzed by issue template',
-                    body: this.convertToTemplate(),
+                    body: this.convertToTemplate(this.templateAttributes(start, end)),
                 });
             }
             catch (error) {
                 console.error('failed to create issue', error);
             }
+        };
+        this.convertToTemplate = (attributes) => {
+            return Mustache.render(this.template(), attributes);
+        };
+        this.template = () => {
+            return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
+        };
+        this.templateAttributes = (start, end) => {
+            const closedIssues = this.pulls.filtedClosed(start, end);
+            return {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                numberOfClosedIssues: closedIssues.values().length,
+                closedIssueTimeAverage: closedIssues.closedTimeAverage(),
+            };
         };
     }
 }
@@ -18133,51 +18134,33 @@ class PullsAnalyzer {
     count() {
         return this.pulls.length;
     }
-    filter(start, end) {
-        const filtered = this.pulls.filter((pull) => {
-            const createdAt = new Date(pull.created_at);
-            if (createdAt >= start && createdAt <= end) {
-                return true;
-            }
-            if (pull.closed_at) {
-                const closedAt = new Date(pull.closed_at);
-                return closedAt >= start && closedAt <= end;
-            }
-            return false;
-        });
-        return new PullsAnalyzer(filtered);
-    }
-    closed(start, end) {
+    filtedClosed(start, end) {
         const filtered = this.pulls.filter((pull) => {
             if (!pull.closed_at)
                 return false;
             const closedAt = new Date(pull.closed_at);
             return closedAt >= start && closedAt <= end;
         });
-        return new PullsAnalyzer(filtered);
+        return new ClosedPullsAnalyzer(filtered);
     }
-    closedWithinThePeriod(start, end) {
-        return this.pulls.filter((pull) => {
-            if (!pull.closed_at)
-                return false;
-            const closedAt = new Date(pull.closed_at);
-            return closedAt >= start && closedAt <= end;
-        });
+}
+exports.PullsAnalyzer = PullsAnalyzer;
+class ClosedPullsAnalyzer extends PullsAnalyzer {
+    constructor(pulls) {
+        super(pulls);
     }
-    closedAverage(start, end) {
-        const closed = this.closed(start, end);
-        const totalClosedTime = (0, lodash_1.sumBy)(closed.values(), (pull) => {
+    closedTimeAverage() {
+        const totalClosedTime = (0, lodash_1.sumBy)(this.pulls, (pull) => {
             return (new Date(pull.closed_at).getTime() -
                 new Date(pull.created_at).getTime());
         });
-        const avarageAsSeconds = totalClosedTime / closed.count();
+        const avarageAsSeconds = totalClosedTime / this.pulls.length;
         const days = Math.floor(avarageAsSeconds / (24 * 60 * 60));
         const hours = Math.floor((avarageAsSeconds % (24 * 60 * 60)) / (60 * 60));
         const minutes = Math.floor((avarageAsSeconds % (60 * 60)) / 60);
         return { days, hours, minutes };
     }
 }
-exports.PullsAnalyzer = PullsAnalyzer;
 
 
 /***/ }),
@@ -22219,13 +22202,11 @@ if (!token) {
     console.error('GITHUB_TOKEN is required');
     process.exit(1);
 }
-console.log('repo:', repo);
-console.log('token:', token);
 async function run() {
     const client = (0, github_client_1.createGitHubClient)(token, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const analyzed = new analyzed_1.Analyzed(client, pulls);
-    analyzed.convertAnalzedToIssue();
+    analyzed.convertAnalzedToIssue(new Date('2025-01-01'), new Date('2025-12-31'));
 }
 try {
     run();
