@@ -18042,7 +18042,7 @@ class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
-        this.convertAnalzedToIssue = async (start, end) => {
+        this.toIssue = async (start, end) => {
             try {
                 await this.gitHubClient.octokit.issues.create({
                     owner: this.gitHubClient.owner,
@@ -18062,12 +18062,16 @@ class Analyzed {
             return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
         };
         this.templateAttributes = (start, end) => {
-            const closedIssues = this.pulls.filtedClosed(start, end);
+            const mergedPulls = this.pulls.filtedMerged(start, end);
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
-                numberOfClosedIssues: closedIssues.values().length,
-                closedIssueTimeAverage: closedIssues.closedTimeAverage(),
+                pulls: {
+                    merged: {
+                        count: mergedPulls.count(),
+                        averageTime: mergedPulls.mergedTimeAverage(),
+                    },
+                },
             };
         };
     }
@@ -18134,33 +18138,34 @@ class PullsAnalyzer {
     count() {
         return this.pulls.length;
     }
-    filtedClosed(start, end) {
+    filtedMerged(start, end) {
         const filtered = this.pulls.filter((pull) => {
             if (!pull.closed_at)
                 return false;
             const closedAt = new Date(pull.closed_at);
             return closedAt >= start && closedAt <= end;
         });
-        return new ClosedPullsAnalyzer(filtered);
+        return new MergedPullsAnalyzer(filtered);
     }
 }
 exports.PullsAnalyzer = PullsAnalyzer;
-class ClosedPullsAnalyzer extends PullsAnalyzer {
+class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls) {
         super(pulls);
     }
-    closedTimeAverage() {
-        const totalClosedTime = (0, lodash_1.sumBy)(this.pulls, (pull) => {
-            console.log(pull.closed_at, pull.created_at, new Date(pull.closed_at).getTime() -
-                new Date(pull.created_at).getTime());
-            return (new Date(pull.closed_at).getTime() -
-                new Date(pull.created_at).getTime());
+    mergedTimeAverage() {
+        const sumTime = (0, lodash_1.sumBy)(this.pulls, (pull) => {
+            const mergedAt = new Date(pull.merged_at).getTime();
+            const createdAt = new Date(pull.created_at).getTime();
+            const diff = mergedAt - createdAt;
+            return Math.floor(diff / 1000);
         });
-        console.log(`totalClosedTime: ${Math.floor(totalClosedTime / 1000)}`);
-        const avarageAsSeconds = Math.floor(totalClosedTime / 1000) / this.pulls.length;
-        const days = Math.floor(avarageAsSeconds / (24 * 60 * 60));
-        const hours = Math.floor((avarageAsSeconds % (24 * 60 * 60)) / (60 * 60));
-        const minutes = Math.floor((avarageAsSeconds % (60 * 60)) / 60);
+        return this.secondsToTime(sumTime / this.pulls.length);
+    }
+    secondsToTime(seconds) {
+        const days = Math.floor(seconds / (24 * 60 * 60));
+        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((seconds % (60 * 60)) / 60);
         return { days, hours, minutes };
     }
 }
@@ -22209,7 +22214,7 @@ async function run() {
     const client = (0, github_client_1.createGitHubClient)(token, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const analyzed = new analyzed_1.Analyzed(client, pulls);
-    analyzed.convertAnalzedToIssue(new Date('2025-01-01'), new Date('2025-12-31'));
+    analyzed.toIssue(new Date('2025-01-01'), new Date('2025-12-31'));
 }
 try {
     run();

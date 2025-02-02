@@ -19,7 +19,7 @@ async function run() {
   const pulls = await listPulls(client)
 
   const analyzed = new Analyzed(client, pulls)
-  analyzed.convertAnalzedToIssue(new Date('2025-01-01'), new Date('2025-12-31'))
+  analyzed.toIssue(new Date('2025-01-01'), new Date('2025-12-31'))
 }
 
 try {

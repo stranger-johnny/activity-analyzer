@@ -2,13 +2,17 @@ import * as Mustache from 'mustache'
 import * as fs from 'fs'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
-import { Pull } from '@/types'
+import { Pull, Time } from '@/types'
 
 type AnalyzedTemplateAttributes = {
   startDate: string
   endDate: string
-  numberOfClosedIssues: number
-  closedIssueTimeAverage: { days: number; hours: number; minutes: number }
+  pulls: {
+    merged: {
+      count: number
+      averageTime: Time
+    }
+  }
 }
 
 export class Analyzed {
@@ -17,10 +21,7 @@ export class Analyzed {
     private pulls: PullsAnalyzer
   ) {}
 
-  public convertAnalzedToIssue = async (
-    start: Date,
-    end: Date
-  ): Promise<void> => {
+  public toIssue = async (start: Date, end: Date): Promise<void> => {
     try {
       await this.gitHubClient.octokit.issues.create({
         owner: this.gitHubClient.owner,
@@ -47,12 +48,16 @@ export class Analyzed {
     start: Date,
     end: Date
   ): AnalyzedTemplateAttributes => {
-    const closedIssues = this.pulls.filtedClosed(start, end)
+    const mergedPulls = this.pulls.filtedMerged(start, end)
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
-      numberOfClosedIssues: closedIssues.values().length,
-      closedIssueTimeAverage: closedIssues.closedTimeAverage(),
+      pulls: {
+        merged: {
+          count: mergedPulls.count(),
+          averageTime: mergedPulls.mergedTimeAverage(),
+        },
+      },
     }
   }
 }

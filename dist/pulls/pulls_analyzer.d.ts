@@ -1,17 +1,14 @@
-import type { Pull } from '@/types';
+import type { Pull, Time } from '@/types';
 export declare class PullsAnalyzer {
     protected pulls: Pull[];
     constructor(pulls: Pull[]);
     values(): Pull[];
     count(): number;
-    filtedClosed(start: Date, end: Date): ClosedPullsAnalyzer;
+    filtedMerged(start: Date, end: Date): MergedPullsAnalyzer;
 }
-declare class ClosedPullsAnalyzer extends PullsAnalyzer {
+declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
-    closedTimeAverage(): {
-        days: number;
-        hours: number;
-        minutes: number;
-    };
+    mergedTimeAverage(): Time;
+    private secondsToTime;
 }
 export {};

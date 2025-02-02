@@ -1,5 +1,6 @@
-import type { Pull } from '@/types'
-import { sumBy } from 'lodash'
+import type { Pull, Time } from '@/types'
+import { close } from 'fs'
+import { sumBy, sortBy } from 'lodash'
 
 export class PullsAnalyzer {
   constructor(protected pulls: Pull[]) {}
@@ -12,41 +13,35 @@ export class PullsAnalyzer {
     return this.pulls.length
   }
 
-  public filtedClosed(start: Date, end: Date): ClosedPullsAnalyzer {
+  public filtedMerged(start: Date, end: Date): MergedPullsAnalyzer {
     const filtered = this.pulls.filter((pull) => {
       if (!pull.closed_at) return false
       const closedAt = new Date(pull.closed_at)
       return closedAt >= start && closedAt <= end
     })
-    return new ClosedPullsAnalyzer(filtered)
+    return new MergedPullsAnalyzer(filtered)
   }
 }
 
-class ClosedPullsAnalyzer extends PullsAnalyzer {
+class MergedPullsAnalyzer extends PullsAnalyzer {
   public constructor(pulls: Pull[]) {
     super(pulls)
   }
 
-  public closedTimeAverage(): { days: number; hours: number; minutes: number } {
-    const totalClosedTime = sumBy(this.pulls, (pull) => {
-      console.log(
-        pull.closed_at,
-        pull.created_at,
-        new Date(pull.closed_at!).getTime() -
-          new Date(pull.created_at).getTime()
-      )
-      return (
-        new Date(pull.closed_at!).getTime() -
-        new Date(pull.created_at).getTime()
-      )
+  public mergedTimeAverage(): Time {
+    const sumTime = sumBy(this.pulls, (pull) => {
+      const mergedAt = new Date(pull.merged_at!).getTime()
+      const createdAt = new Date(pull.created_at).getTime()
+      const diff = mergedAt - createdAt
+      return Math.floor(diff / 1000)
     })
-    console.log(`totalClosedTime: ${Math.floor(totalClosedTime / 1000)}`)
-    const avarageAsSeconds =
-      Math.floor(totalClosedTime / 1000) / this.pulls.length
+    return this.secondsToTime(sumTime / this.pulls.length)
+  }
 
-    const days = Math.floor(avarageAsSeconds / (24 * 60 * 60))
-    const hours = Math.floor((avarageAsSeconds % (24 * 60 * 60)) / (60 * 60))
-    const minutes = Math.floor((avarageAsSeconds % (60 * 60)) / 60)
+  private secondsToTime(seconds: number): Time {
+    const days = Math.floor(seconds / (24 * 60 * 60))
+    const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60))
+    const minutes = Math.floor((seconds % (60 * 60)) / 60)
     return { days, hours, minutes }
   }
 }

@@ -40,7 +40,7 @@ class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
-        this.convertAnalzedToIssue = async (start, end) => {
+        this.toIssue = async (start, end) => {
             try {
                 await this.gitHubClient.octokit.issues.create({
                     owner: this.gitHubClient.owner,
@@ -60,12 +60,16 @@ class Analyzed {
             return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
         };
         this.templateAttributes = (start, end) => {
-            const closedIssues = this.pulls.filtedClosed(start, end);
+            const mergedPulls = this.pulls.filtedMerged(start, end);
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
-                numberOfClosedIssues: closedIssues.values().length,
-                closedIssueTimeAverage: closedIssues.closedTimeAverage(),
+                pulls: {
+                    merged: {
+                        count: mergedPulls.count(),
+                        averageTime: mergedPulls.mergedTimeAverage(),
+                    },
+                },
             };
         };
     }

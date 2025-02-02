@@ -3,13 +3,18 @@ Activity analyzer
 # Period
 {{startDate}} ~ {{endDate}}
 
-# Issue
+{{#pulls}}
+# Pull Request
 
 |||
 |---|---|
-{{#numberOfClosedIssues}}
-|closeされたissueの数|{{numberOfClosedIssues}}|
-{{/numberOfClosedIssues}}
-{{#closedIssueTimeAverage}}
+{{#merged}}
+{{#count}}
+|マージされたissueの数|{{count}}|
+{{/count}}
+{{#averageTime}}
 |closeするまでの平均時間|{{#days}}{{days}}日{{/days}}{{#hours}}{{hours}}時間{{/hours}}{{#minutes}}{{minutes}}分{{/minutes}}|
-{{/closedIssueTimeAverage}}
+{{/averageTime}}
+{{/merged}}
+
+{{/pulls}}
