@@ -29,11 +29,13 @@ class ClosedPullsAnalyzer extends PullsAnalyzer {
 
   public closedTimeAverage(): { days: number; hours: number; minutes: number } {
     const totalClosedTime = sumBy(this.pulls, (pull) => {
+      console.log(pull.closed_at, pull.created_at)
       return (
         new Date(pull.closed_at!).getTime() -
         new Date(pull.created_at).getTime()
       )
     })
+    console.log(`totalClosedTime: ${totalClosedTime}`)
     const avarageAsSeconds = totalClosedTime / this.pulls.length
 
     const days = Math.floor(avarageAsSeconds / (24 * 60 * 60))
