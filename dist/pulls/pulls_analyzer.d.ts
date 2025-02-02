@@ -8,7 +8,10 @@ export declare class PullsAnalyzer {
 }
 declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
+    private pullsWithMergeTime;
     mergedTimeAverage(): Time;
+    mergedTimeChart(): string;
     private secondsToTime;
+    private secondsToHour;
 }
 export {};

@@ -68,6 +68,7 @@ class Analyzed {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
+                        chart: mergedPulls.mergedTimeChart(),
                     },
                 },
             };

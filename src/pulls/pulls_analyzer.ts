@@ -25,17 +25,40 @@ export class PullsAnalyzer {
 
 class MergedPullsAnalyzer extends PullsAnalyzer {
   public constructor(pulls: Pull[]) {
-    super(pulls)
+    super(pulls.sort((a, b) => (a.merged_at! > b.merged_at! ? 1 : -1)))
   }
 
-  public mergedTimeAverage(): Time {
-    const sumTime = sumBy(this.pulls, (pull) => {
+  private pullsWithMergeTime(): (Pull & { minutesNeedToMerge: number })[] {
+    return this.pulls.map((pull) => {
       const mergedAt = new Date(pull.merged_at!).getTime()
       const createdAt = new Date(pull.created_at).getTime()
       const diff = mergedAt - createdAt
-      return Math.floor(diff / 1000)
+      return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) }
+    })
+  }
+
+  public mergedTimeAverage(): Time {
+    const sumTime = sumBy(this.pullsWithMergeTime(), (pull) => {
+      return pull.minutesNeedToMerge
     })
     return this.secondsToTime(sumTime / this.pulls.length)
+  }
+
+  public mergedTimeChart(): string {
+    const pulls = this.pullsWithMergeTime().map((pull) => {
+      return {
+        number: `#${pull.number}`,
+        hours: this.secondsToHour(pull.minutesNeedToMerge),
+      }
+    })
+
+    return `
+    xychart-beta
+      title "PR Merge Time"
+      x-axis [${pulls.map((pull) => pull.number).join(',')}]
+      y-axis "Merge Time (minutes)"
+      bar [${pulls.map((pull) => pull.hours).join(',')}]
+    `
   }
 
   private secondsToTime(seconds: number): Time {
@@ -43,5 +66,9 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60))
     const minutes = Math.floor((seconds % (60 * 60)) / 60)
     return { days, hours, minutes }
+  }
+
+  private secondsToHour(seconds: number): number {
+    return seconds / (60 * 60)
   }
 }

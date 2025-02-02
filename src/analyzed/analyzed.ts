@@ -11,6 +11,7 @@ type AnalyzedTemplateAttributes = {
     merged: {
       count: number
       averageTime: Time
+      chart: string
     }
   }
 }
@@ -56,6 +57,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
+          chart: mergedPulls.mergedTimeChart(),
         },
       },
     }
