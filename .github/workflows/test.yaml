@@ -15,4 +15,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Use My Actions
-        uses: ./github/actions/activity-analyzer
+        uses: .github/actions/activity-analyzer
