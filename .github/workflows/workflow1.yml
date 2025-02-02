@@ -2,8 +2,7 @@ name: 'Test My Action'
 
 on:
   pull_request:
-    branches:
-      - main
+    types: [opened, reopened]
 
 jobs:
   hello:
