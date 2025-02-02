@@ -19,7 +19,6 @@
   "homepage": "https://github.com/stranger-johnny/activity-analyzer#readme",
   "description": "",
   "devDependencies": {
-    "@types/moment": "^2.11.29",
     "@types/node": "^22.12.0",
     "@typescript-eslint/eslint-plugin": "^8.22.0",
     "@typescript-eslint/parser": "^8.22.0",
