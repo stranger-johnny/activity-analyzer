@@ -10,7 +10,10 @@ declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
     private pullsWithMergeTime;
     mergedTimeAverage(): Time;
-    mergedTimeChart(): string;
+    mergedTimesPerPull(): {
+        number: `#${number}`;
+        hours: number;
+    }[];
     private secondsToTime;
     private secondsToHour;
 }

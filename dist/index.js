@@ -18063,6 +18063,7 @@ class Analyzed {
         };
         this.templateAttributes = (start, end) => {
             const mergedPulls = this.pulls.filtedMerged(start, end);
+            const mergedTime = mergedPulls.mergedTimesPerPull();
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
@@ -18070,7 +18071,10 @@ class Analyzed {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
-                        chart: mergedPulls.mergedTimeChart(),
+                        chart: {
+                            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
+                            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
+                        },
                     },
                 },
             };
@@ -18169,20 +18173,13 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         });
         return this.secondsToTime(sumTime / this.pulls.length);
     }
-    mergedTimeChart() {
-        const pulls = this.pullsWithMergeTime().map((pull) => {
+    mergedTimesPerPull() {
+        return this.pullsWithMergeTime().map((pull) => {
             return {
                 number: `#${pull.number}`,
                 hours: this.secondsToHour(pull.minutesNeedToMerge),
             };
         });
-        return `
-    xychart-beta
-      title \"PR Merge Time\"
-      x-axis [${pulls.map((pull) => pull.number).join(',')}]
-      y-axis \"Merge Time (minutes)\"
-      bar [${pulls.map((pull) => pull.hours).join(',')}]
-    `;
     }
     secondsToTime(seconds) {
         const days = Math.floor(seconds / (24 * 60 * 60));

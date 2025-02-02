@@ -45,21 +45,13 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     return this.secondsToTime(sumTime / this.pulls.length)
   }
 
-  public mergedTimeChart(): string {
-    const pulls = this.pullsWithMergeTime().map((pull) => {
+  public mergedTimesPerPull(): { number: `#${number}`; hours: number }[] {
+    return this.pullsWithMergeTime().map((pull) => {
       return {
         number: `#${pull.number}`,
         hours: this.secondsToHour(pull.minutesNeedToMerge),
       }
     })
-
-    return `
-    xychart-beta
-      title \"PR Merge Time\"
-      x-axis [${pulls.map((pull) => pull.number).join(',')}]
-      y-axis \"Merge Time (minutes)\"
-      bar [${pulls.map((pull) => pull.hours).join(',')}]
-    `
   }
 
   private secondsToTime(seconds: number): Time {

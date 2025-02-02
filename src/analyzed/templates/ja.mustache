@@ -1,10 +1,10 @@
-Activity analyzer
+# Activity analyzer
 
-# Period
+## Period
 {{startDate}} ~ {{endDate}}
 
 {{#pulls}}
-# Pull Request
+## Pull Request
 
 |||
 |---|---|
@@ -18,7 +18,11 @@ Activity analyzer
 
 {{#chart}}
 ```mermaid
-{{{chart}}}
+xychart-beta
+    title "マージに要した時間"
+    x-axis {{xaxis}}
+    y-axis "時間 (hours)"
+    bar {{bars}}
 ```
 {{/chart}}
 {{/merged}}

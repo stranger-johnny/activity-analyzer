@@ -11,7 +11,7 @@ type AnalyzedTemplateAttributes = {
     merged: {
       count: number
       averageTime: Time
-      chart: string
+      chart: { xaxis: `[${string}]`; bars: `[${string}]` }
     }
   }
 }
@@ -50,6 +50,7 @@ export class Analyzed {
     end: Date
   ): AnalyzedTemplateAttributes => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
+    const mergedTime = mergedPulls.mergedTimesPerPull()
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -57,7 +58,10 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: mergedPulls.mergedTimeChart(),
+          chart: {
+            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
+            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
+          },
         },
       },
     }
