@@ -1,5 +1,5 @@
 name: Activity Analyzer
 description: Analyze the activity of the repository.
 runs:
-  using: ubuntu-latest
+  using: node20
   main: 'dist/index.js'
