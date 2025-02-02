@@ -13,12 +13,15 @@ async function getPrsAverageTime(owner: string, repo: string) {
   const oneWeekAgo = new Date(now)
   oneWeekAgo.setDate(now.getDate() - 7)
 
-  const prs = await octokit.paginate(octokit.rest.pulls.list, {
-    owner,
-    repo,
-    state: undefined,
-    per_page: 100,
-  })
+  const prs = await octokit.paginate(
+    /* octokit.rest.pulls.list */ 'GET /repos/{owner}/{repo}/pulls',
+    {
+      owner,
+      repo,
+      state: undefined,
+      per_page: 100,
+    }
+  )
 
   console.log(prs)
 
