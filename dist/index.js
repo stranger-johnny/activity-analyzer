@@ -4966,9 +4966,9 @@ if (!owner) {
     console.error('GITHUB_OWNER is required');
     process.exit(1);
 }
-const repo = process.env.GitHUB_REPO;
+const repo = process.env.GITHUB_REPOSITORY;
 if (!repo) {
-    console.error('GitHUB_REPO is required');
+    console.error('GITHUB_REPOSITORY is required');
     process.exit(1);
 }
 const token = process.env.GITHUB_TOKEN;
