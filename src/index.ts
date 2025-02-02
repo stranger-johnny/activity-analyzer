@@ -1,5 +1,12 @@
-import { Octokit } from '@octokit/rest'
-import { collectPulls } from './pulls'
+import { listPulls } from '@/pulls'
+import { Analyzed } from '@/analyzed/analyzed'
+import { createGitHubClient } from '@/octokit/github_client'
+
+const repo = process.env.GITHUB_REPOSITORY
+if (!repo) {
+  console.error('GITHUB_REPOSITORY is required')
+  process.exit(1)
+}
 
 const token = process.env.GITHUB_TOKEN
 if (!token) {
@@ -7,20 +14,19 @@ if (!token) {
   process.exit(1)
 }
 
-const octokit = new Octokit({ auth: token })
+console.log('repo:', repo)
+console.log('token:', token)
 
-async function getPrsAverageTime(owner: string, repo: string) {
-  const pulls = await collectPulls(octokit, owner, repo)
-  console.log(pulls.values)
+async function run() {
+  const client = createGitHubClient(token!, repo!)
+  const pulls = await listPulls(client)
 
-  console.log('closed pulls', pulls.closed)
-
-  await octokit.issues.create({
-    owner: owner,
-    repo: repo,
-    title: 'test',
-    body: 'issueが作れるかのテスト',
-  })
+  const analyzed = new Analyzed(client, pulls)
+  analyzed.convertAnalzedToIssue()
 }
 
-getPrsAverageTime('stranger-johnny', 'activity-analyzer').catch(console.error)
+try {
+  run()
+} catch (error) {
+  console.error(error)
+}

@@ -1,14 +1,7 @@
-import { Octokit } from '@octokit/rest';
 import { Pull } from '@/types';
+import { GitHubClient } from '@/octokit/github_client';
 export declare class PullsClient {
-    private octokit;
-    private owner;
-    private repo;
-    constructor(octokit: Octokit, owner: string, repo: string);
+    private gitHubClient;
+    constructor(gitHubClient: GitHubClient);
     collect(): Promise<Pull[]>;
-}
-export declare class Pulls {
-    private pulls;
-    constructor(pulls: Pull[]);
-    filter(start: Date, end: Date): Pulls;
 }
