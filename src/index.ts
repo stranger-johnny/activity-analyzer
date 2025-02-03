@@ -22,6 +22,8 @@ if (!configPath) {
   process.exit(1)
 }
 
+console.log(process.env.GITHUB_WORKSPACE)
+
 async function run() {
   console.log(loadInput(configPath))
   const client = createGitHubClient(token!, repo!)
