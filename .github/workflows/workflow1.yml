@@ -14,4 +14,4 @@ jobs:
         with:
           repo: ${{ github.repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          config_path: ${{ github.workspace }}/.github/config.yml
+          config_path: ${{ github.workspace }}/.github/config.yaml
