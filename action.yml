@@ -1,6 +1,12 @@
 name: My GitHub Action
 description: A simple GitHub Action written in TypeScript
 inputs:
+  repo:
+    description: 'Your github repository'
+    required: true
+  token:
+    description: 'Your github token'
+    required: true
   config_path:
     description: 'Path to the configuration file'
     required: true

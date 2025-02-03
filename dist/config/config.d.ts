@@ -7,5 +7,5 @@ declare const ConfigSchema: z.ZodObject<{
     lang: "ja" | "en";
 }>;
 type Config = z.infer<typeof ConfigSchema>;
-export declare function loadInput(path: string): Promise<Config>;
+export declare const loadInput: (path: string) => Promise<Config>;
 export {};

@@ -7,7 +7,7 @@ const ConfigSchema = z.object({
 })
 type Config = z.infer<typeof ConfigSchema>
 
-export async function loadInput(path: string): Promise<Config> {
+export const loadInput = async (path: string): Promise<Config> => {
   try {
     const yamlData = await readFile(path, 'utf8')
     const data = load(yamlData)

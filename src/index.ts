@@ -1,33 +1,29 @@
-import * as core from '@actions/core'
+import { getInput } from '@actions/core'
 import { listPulls } from '@/pulls'
 import { Analyzed } from '@/analyzed/analyzed'
 import { createGitHubClient } from '@/octokit/github_client'
+import { loadInput } from '@/config/config'
 
-// const repo = process.env.GITHUB_REPOSITORY
-// if (!repo) {
-//   console.error('GITHUB_REPOSITORY is required')
-//   process.exit(1)
-// }
-
-// const token = process.env.GITHUB_TOKEN
-// if (!token) {
-//   console.error('GITHUB_TOKEN is required')
-//   process.exit(1)
-// }
-
-const repo = core.getInput('repo', { required: true })
+const repo = getInput('repo', { required: true })
 if (!repo) {
-  console.error('GITHUB_REPOSITORY is required')
+  console.error('repo is required')
   process.exit(1)
 }
 
-const token = core.getInput('token', { required: true })
+const token = getInput('token', { required: true })
 if (!token) {
-  console.error('GITHUB_TOKEN is required')
+  console.error('token is required')
+  process.exit(1)
+}
+
+const configPath = getInput('config_path', { required: true })
+if (!configPath) {
+  console.error('config path is required')
   process.exit(1)
 }
 
 async function run() {
+  console.log(loadInput(configPath))
   const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 
