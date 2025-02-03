@@ -58411,7 +58411,7 @@ if (!configPath) {
 }
 console.log(process.env.GITHUB_WORKSPACE);
 async function run() {
-    console.log((0, config_1.loadInput)(configPath));
+    console.log(await (0, config_1.loadInput)(configPath));
     const client = (0, github_client_1.createGitHubClient)(token, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const analyzed = new analyzed_1.Analyzed(client, pulls);

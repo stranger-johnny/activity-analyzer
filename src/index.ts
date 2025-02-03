@@ -25,7 +25,7 @@ if (!configPath) {
 console.log(process.env.GITHUB_WORKSPACE)
 
 async function run() {
-  console.log(loadInput(configPath))
+  console.log(await loadInput(configPath))
   const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 
