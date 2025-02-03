@@ -1,5 +1,9 @@
 name: My GitHub Action
 description: A simple GitHub Action written in TypeScript
+inputs:
+  config_path:
+    description: 'Path to the configuration file'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

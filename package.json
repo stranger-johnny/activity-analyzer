@@ -18,6 +18,7 @@
   "homepage": "https://github.com/stranger-johnny/activity-analyzer#readme",
   "description": "",
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.15",
     "@types/moment": "^2.11.29",
     "@types/mustache": "^4.2.5",
@@ -37,7 +38,9 @@
     "@octokit/request-error": "^6.1.6",
     "@octokit/rest": "^21.1.0",
     "@vercel/ncc": "^0.38.3",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "zod": "^3.24.1"
   }
 }
