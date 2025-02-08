@@ -2,6 +2,7 @@ import { ImageMergedTime } from '@/analyzed/image'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Time } from '@/types'
+import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as Mustache from 'mustache'
 
@@ -54,6 +55,7 @@ export class Analyzed {
     const mergedPulls = this.pulls.filtedMerged(start, end)
     const mergedTimeImage = new ImageMergedTime(mergedPulls)
     console.log(await mergedTimeImage.imageAsBase64())
+    core.setOutput('chart', await mergedTimeImage.imageAsBase64())
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
