@@ -2,7 +2,6 @@ import { ImageMergedTime } from '@/analyzed/image'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Time } from '@/types'
-import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as Mustache from 'mustache'
 
@@ -54,8 +53,16 @@ export class Analyzed {
   ): Promise<AnalyzedTemplateAttributes> => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
     const mergedTimeImage = new ImageMergedTime(mergedPulls)
-    console.log(await mergedTimeImage.imageAsBase64())
-    core.setOutput('chart', await mergedTimeImage.imageAsBase64())
+
+    const res = await this.gitHubClient.octokit.rest.git.createBlob({
+      owner: this.gitHubClient.owner,
+      repo: this.gitHubClient.repo,
+      content: await mergedTimeImage.imageAsBase64(),
+      encoding: 'base64',
+    })
+
+    console.log(res)
+
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -63,7 +70,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: await mergedTimeImage.imageAsBase64(),
+          chart: `<img src="${res.url}" />`,
         },
       },
     }
