@@ -1,5 +1,4 @@
 import { OutputConfig } from '@/config/output_config'
-import { MergedPerUserChart } from '@/export/chart'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import dayjs from 'dayjs'
@@ -17,13 +16,23 @@ type AnalyzedTemplateAttributes = {
   }
   pulls: {
     merged: {
-      current?: {
+      current: {
         count: number
-        chart: string
+        perUser: {
+          avator: string
+          name: string
+          count: number
+          links: string[]
+        }[]
       }
-      previous?: {
+      previous: {
         count: number
-        chart: string
+        perUser: {
+          avator: string
+          name: string
+          count: number
+          links: string[]
+        }[]
       }
     }
   }
@@ -68,12 +77,17 @@ export class ExportToIssue {
         this.config.current.start,
         this.config.current.end
       )
-      if (mergedPulls.count() === 0) {
-        return undefined
-      }
+      const perUser = mergedPulls.mergedPullPerUser()
       return {
         count: mergedPulls.count(),
-        chart: new MergedPerUserChart(mergedPulls).asMarmaidContents(),
+        perUser: perUser.map((user) => ({
+          avator: user.user.avator,
+          name: user.user.name,
+          count: user.pulls.length,
+          links: user.pulls.map((pull) => {
+            return `[${pull.title}](${pull.html_url})<br>`
+          }),
+        })),
       }
     })()
     const previousPulls = (() => {
@@ -81,12 +95,17 @@ export class ExportToIssue {
         this.config.previous.start,
         this.config.previous.end
       )
-      if (mergedPulls.count() === 0) {
-        return undefined
-      }
+      const perUser = mergedPulls.mergedPullPerUser()
       return {
         count: mergedPulls.count(),
-        chart: new MergedPerUserChart(mergedPulls).asMarmaidContents(),
+        perUser: perUser.map((user) => ({
+          avator: user.user.avator,
+          name: user.user.name,
+          count: user.pulls.length,
+          links: user.pulls.map((pull) => {
+            return `[${pull.title}](${pull.html_url})<br>`
+          }),
+        })),
       }
     })()
     return {
@@ -100,8 +119,8 @@ export class ExportToIssue {
       },
       pulls: {
         merged: {
-          current: currentPulls ? { ...currentPulls } : undefined,
-          previous: previousPulls ? { ...previousPulls } : undefined,
+          current: currentPulls,
+          previous: previousPulls,
         },
       },
     }

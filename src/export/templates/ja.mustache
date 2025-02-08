@@ -10,34 +10,13 @@
 
 ### Current Period ({{{current.start}}} ~ {{{current.end}}})
 {{#current}}
-#### マージされたPR数
+#### マージされたPR数（トータル）
 {{#count}}{{count}} PRs{{/count}}
 
-{{#chart}}
-```mermaid
-{{{chart}}}
-```
-{{/chart}} 
-{{/current}} 
-{{^current}} 
-0 PRs 
-{{/current}}
+#### ユーザーごとにマージされたPR数（ユーザーごと）
 
-### Previous Period ({{{previous.start}}} ~ {{{previous.end}}})
-{{#previous}}
-#### マージされたPR数
-{{#count}}{{count}} PRs{{/count}}
-
-{{#chart}}
-```mermaid
-{{{chart}}}
-```
-{{/chart}}
-{{/previous}}
-{{^previous}}
-0 PRs
-{{/previous}}
-
-{{/merged}}
-
-{{/pulls}}
+| ユーザー | マージしたPR数 | マージしたPR |
+| --- | --- | --- |
+{{#perUser}}
+| <img src="{{avator}}" width="32"> {{name}} | {{count}} PRs | {{links}} |
+{{/perUser}}

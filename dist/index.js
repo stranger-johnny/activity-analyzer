@@ -52330,34 +52330,6 @@ exports.loadInput = loadInput;
 
 /***/ }),
 
-/***/ 4122:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MergedPerUserChart = void 0;
-class MergedPerUserChart {
-    constructor(pulls) {
-        this.pulls = pulls;
-        this.asMarmaidContents = () => {
-            const mergedPullPerUser = this.pulls.mergedPullPerUser();
-            const xaxis = mergedPullPerUser.map((pull) => pull.user).join(',');
-            const bars = mergedPullPerUser.map((pull) => pull.pulls.length).join(',');
-            return `
-    xychart-beta
-        x-axis "User" [${xaxis}]
-        y-axis "Number of Merge PRs"
-        bar [${bars}]
-    `;
-        };
-    }
-}
-exports.MergedPerUserChart = MergedPerUserChart;
-
-
-/***/ }),
-
 /***/ 9037:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -52368,7 +52340,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ExportToIssue = void 0;
-const chart_1 = __nccwpck_require__(4122);
 const dayjs_1 = __importDefault(__nccwpck_require__(3706));
 const fs_1 = __nccwpck_require__(9896);
 const mustache_1 = __nccwpck_require__(2374);
@@ -52401,22 +52372,32 @@ class ExportToIssue {
         this.templateAttributes = () => {
             const currentPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
-                if (mergedPulls.count() === 0) {
-                    return undefined;
-                }
+                const perUser = mergedPulls.mergedPullPerUser();
                 return {
                     count: mergedPulls.count(),
-                    chart: new chart_1.MergedPerUserChart(mergedPulls).asMarmaidContents(),
+                    perUser: perUser.map((user) => ({
+                        avator: user.user.avator,
+                        name: user.user.name,
+                        count: user.pulls.length,
+                        links: user.pulls.map((pull) => {
+                            return `[${pull.title}](${pull.html_url})<br>`;
+                        }),
+                    })),
                 };
             })();
             const previousPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
-                if (mergedPulls.count() === 0) {
-                    return undefined;
-                }
+                const perUser = mergedPulls.mergedPullPerUser();
                 return {
                     count: mergedPulls.count(),
-                    chart: new chart_1.MergedPerUserChart(mergedPulls).asMarmaidContents(),
+                    perUser: perUser.map((user) => ({
+                        avator: user.user.avator,
+                        name: user.user.name,
+                        count: user.pulls.length,
+                        links: user.pulls.map((pull) => {
+                            return `[${pull.title}](${pull.html_url})<br>`;
+                        }),
+                    })),
                 };
             })();
             return {
@@ -52430,8 +52411,8 @@ class ExportToIssue {
                 },
                 pulls: {
                     merged: {
-                        current: currentPulls ? { ...currentPulls } : undefined,
-                        previous: previousPulls ? { ...previousPulls } : undefined,
+                        current: currentPulls,
+                        previous: previousPulls,
                     },
                 },
             };
@@ -52516,12 +52497,9 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         super(pulls);
     }
     mergedPullPerUser() {
-        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => {
-            console.log(pull.user);
-            return pull.user?.name ?? 'unknown';
-        });
-        return Object.entries(grouped).map(([user, pulls]) => ({
-            user,
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
+        return Object.entries(grouped).map(([userId, pulls]) => ({
+            user: { name: userId, avator: pulls[0]?.user?.avatar_url ?? '' },
             pulls,
         }));
     }
