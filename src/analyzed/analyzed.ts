@@ -52,7 +52,7 @@ export class Analyzed {
     end: Date
   ): Promise<AnalyzedTemplateAttributes> => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
-    const mergedTime = mergedPulls.mergedTimesPerPull()
+    console.log(await new ImageMergedTime(mergedPulls).imageAsBase64())
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
