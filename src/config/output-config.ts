@@ -8,7 +8,10 @@ const ConfigSchema = z.object({
   period: z.union([z.literal('last-1week'), z.literal('last-2week')]),
 })
 type Config = z.infer<typeof ConfigSchema>
-export type OutputConfig = Config & { startDate: Date; endDate: Date }
+export type OutputConfig = Config & {
+  current: { start: Date; end: Date }
+  previous: { start: Date; end: Date }
+}
 
 export const loadInput = async (path: string): Promise<OutputConfig> => {
   try {
@@ -21,14 +24,26 @@ export const loadInput = async (path: string): Promise<OutputConfig> => {
       case 'last-1week':
         return {
           ...config,
-          startDate: dayjs().subtract(1, 'week').toDate(),
-          endDate: dayjs().toDate(),
+          current: {
+            start: dayjs().subtract(1, 'week').toDate(),
+            end: dayjs().toDate(),
+          },
+          previous: {
+            start: dayjs().subtract(2, 'week').toDate(),
+            end: dayjs().subtract(1, 'week').toDate(),
+          },
         }
       case 'last-2week':
         return {
           ...config,
-          startDate: dayjs().subtract(2, 'week').toDate(),
-          endDate: dayjs().toDate(),
+          current: {
+            start: dayjs().subtract(2, 'week').toDate(),
+            end: dayjs().subtract(1, 'week').toDate(),
+          },
+          previous: {
+            start: dayjs().subtract(3, 'week').toDate(),
+            end: dayjs().subtract(2, 'week').toDate(),
+          },
         }
     }
   } catch (error) {

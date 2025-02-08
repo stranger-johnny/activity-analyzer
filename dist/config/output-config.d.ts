@@ -11,8 +11,14 @@ declare const ConfigSchema: z.ZodObject<{
 }>;
 type Config = z.infer<typeof ConfigSchema>;
 export type OutputConfig = Config & {
-    startDate: Date;
-    endDate: Date;
+    current: {
+        start: Date;
+        end: Date;
+    };
+    previous: {
+        start: Date;
+        end: Date;
+    };
 };
 export declare const loadInput: (path: string) => Promise<OutputConfig>;
 export {};

@@ -21,14 +21,26 @@ const loadInput = async (path) => {
             case 'last-1week':
                 return {
                     ...config,
-                    startDate: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
-                    endDate: (0, dayjs_1.default)().toDate(),
+                    current: {
+                        start: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                        end: (0, dayjs_1.default)().toDate(),
+                    },
+                    previous: {
+                        start: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    },
                 };
             case 'last-2week':
                 return {
                     ...config,
-                    startDate: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
-                    endDate: (0, dayjs_1.default)().toDate(),
+                    current: {
+                        start: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    },
+                    previous: {
+                        start: (0, dayjs_1.default)().subtract(3, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                    },
                 };
         }
     }

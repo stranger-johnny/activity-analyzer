@@ -52298,14 +52298,26 @@ const loadInput = async (path) => {
             case 'last-1week':
                 return {
                     ...config,
-                    startDate: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
-                    endDate: (0, dayjs_1.default)().toDate(),
+                    current: {
+                        start: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                        end: (0, dayjs_1.default)().toDate(),
+                    },
+                    previous: {
+                        start: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    },
                 };
             case 'last-2week':
                 return {
                     ...config,
-                    startDate: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
-                    endDate: (0, dayjs_1.default)().toDate(),
+                    current: {
+                        start: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    },
+                    previous: {
+                        start: (0, dayjs_1.default)().subtract(3, 'week').toDate(),
+                        end: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                    },
                 };
         }
     }
@@ -52387,16 +52399,32 @@ class ExportToIssue {
             }
         };
         this.templateAttributes = () => {
-            const mergedPulls = this.pulls.filtedMerged(this.config.startDate, this.config.endDate);
-            return {
-                startDate: (0, dayjs_1.default)(this.config.startDate).format('YYYY/MM/DD'),
-                endDate: (0, dayjs_1.default)(this.config.endDate).format('YYYY/MM/DD'),
-                pulls: {
+            const currentPeriodPulls = (() => {
+                const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
+                return {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
                         chart: new image_1.ImageMergedTime(mergedPulls).asMarmaidContents(),
                     },
+                };
+            })();
+            const previousPeriodPulls = (() => {
+                const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
+                return {
+                    merged: {
+                        count: mergedPulls.count(),
+                        averageTime: mergedPulls.mergedTimeAverage(),
+                        chart: new image_1.ImageMergedTime(mergedPulls).asMarmaidContents(),
+                    },
+                };
+            })();
+            return {
+                startDate: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
+                endDate: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
+                pulls: {
+                    current: { ...currentPeriodPulls },
+                    previous: { ...previousPeriodPulls },
                 },
             };
         };

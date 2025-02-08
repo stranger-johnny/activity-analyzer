@@ -11,10 +11,19 @@ type AnalyzedTemplateAttributes = {
   startDate: string
   endDate: string
   pulls: {
-    merged: {
-      count: number
-      averageTime: Time
-      chart: string
+    current: {
+      merged: {
+        count: number
+        averageTime: Time
+        chart: string
+      }
+    }
+    previous: {
+      merged: {
+        count: number
+        averageTime: Time
+        chart: string
+      }
     }
   }
 }
@@ -53,19 +62,38 @@ export class ExportToIssue {
   }
 
   private templateAttributes = (): AnalyzedTemplateAttributes => {
-    const mergedPulls = this.pulls.filtedMerged(
-      this.config.startDate,
-      this.config.endDate
-    )
-    return {
-      startDate: dayjs(this.config.startDate).format('YYYY/MM/DD'),
-      endDate: dayjs(this.config.endDate).format('YYYY/MM/DD'),
-      pulls: {
+    const currentPeriodPulls = (() => {
+      const mergedPulls = this.pulls.filtedMerged(
+        this.config.current.start,
+        this.config.current.end
+      )
+      return {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
           chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
         },
+      }
+    })()
+    const previousPeriodPulls = (() => {
+      const mergedPulls = this.pulls.filtedMerged(
+        this.config.previous.start,
+        this.config.previous.end
+      )
+      return {
+        merged: {
+          count: mergedPulls.count(),
+          averageTime: mergedPulls.mergedTimeAverage(),
+          chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
+        },
+      }
+    })()
+    return {
+      startDate: dayjs(this.config.current.start).format('YYYY/MM/DD'),
+      endDate: dayjs(this.config.current.end).format('YYYY/MM/DD'),
+      pulls: {
+        current: { ...currentPeriodPulls },
+        previous: { ...previousPeriodPulls },
       },
     }
   }
