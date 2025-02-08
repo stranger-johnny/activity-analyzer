@@ -10,7 +10,7 @@ class ImageMergedTime {
             const bars = mergedTimesPerPull.map((pull) => pull.hours).join(',');
             return `
     xychart-beta
-        x-axis "PR" [${{ xaxis }}]
+        x-axis "PR" [${xaxis}]
         y-axis "PR Merge Time (hour)"
         bar [${bars}]
     `;
