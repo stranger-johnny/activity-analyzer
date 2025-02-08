@@ -35,7 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Analyzed = void 0;
 const image_1 = require("@/analyzed/image");
-const core = __importStar(require("@actions/core"));
 const fs = __importStar(require("fs"));
 const Mustache = __importStar(require("mustache"));
 class Analyzed {
@@ -65,8 +64,13 @@ class Analyzed {
         this.templateAttributes = async (start, end) => {
             const mergedPulls = this.pulls.filtedMerged(start, end);
             const mergedTimeImage = new image_1.ImageMergedTime(mergedPulls);
-            console.log(await mergedTimeImage.imageAsBase64());
-            core.setOutput('chart', await mergedTimeImage.imageAsBase64());
+            const res = await this.gitHubClient.octokit.rest.git.createBlob({
+                owner: this.gitHubClient.owner,
+                repo: this.gitHubClient.repo,
+                content: await mergedTimeImage.imageAsBase64(),
+                encoding: 'base64',
+            });
+            console.log(res);
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
@@ -74,7 +78,7 @@ class Analyzed {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
-                        chart: await mergedTimeImage.imageAsBase64(),
+                        chart: `<img src="${res.url}" />`,
                     },
                 },
             };
