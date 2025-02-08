@@ -1,4 +1,4 @@
-import type { Pull, Time } from '@/types';
+import type { Pull } from '@/types';
 export declare class PullsAnalyzer {
     protected pulls: Pull[];
     constructor(pulls: Pull[]);
@@ -8,11 +8,12 @@ export declare class PullsAnalyzer {
 }
 export declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
-    private pullsWithMergeTime;
-    mergedTimeAverage(): Time;
-    mergedTimesPerPull(): {
-        number: `#${number}`;
-        hours: number;
+    mergedPullPerUser(): {
+        user: {
+            name: string;
+            avator: string;
+        };
+        pulls: Pull[];
     }[];
     private secondsToTime;
     private secondsToHour;

@@ -1,4 +1,5 @@
-import { Analyzed } from '@/analyzed/analyzed'
+import { loadInput } from '@/config/output_config'
+import { ExportToIssue } from '@/export/to_issue'
 import { createGitHubClient } from '@/octokit/github_client'
 import { listPulls } from '@/pulls'
 import { getInput } from '@actions/core'
@@ -22,11 +23,13 @@ if (!configPath) {
 }
 
 async function run() {
+  const config = await loadInput(configPath)
+
   const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 
-  const analyzed = new Analyzed(client, pulls)
-  await analyzed.toIssue(new Date('2025-01-01'), new Date('2025-12-31'))
+  const exportToIssue = new ExportToIssue(client, config, pulls)
+  await exportToIssue.do()
 }
 
 ;(async () => await run())()

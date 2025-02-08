@@ -42,17 +42,12 @@ class Analyzed {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
         this.toIssue = async (start, end) => {
-            try {
-                await this.gitHubClient.octokit.issues.create({
-                    owner: this.gitHubClient.owner,
-                    repo: this.gitHubClient.repo,
-                    title: 'Analyzed by issue template',
-                    body: this.convertToTemplate(this.templateAttributes(start, end)),
-                });
-            }
-            catch (error) {
-                console.error('failed to create issue', error);
-            }
+            await this.gitHubClient.octokit.issues.create({
+                owner: this.gitHubClient.owner,
+                repo: this.gitHubClient.repo,
+                title: 'Analyzed by issue template',
+                body: this.convertToTemplate(this.templateAttributes(start, end)),
+            });
         };
         this.convertToTemplate = (attributes) => {
             return Mustache.render(this.template(), attributes);
@@ -62,7 +57,6 @@ class Analyzed {
         };
         this.templateAttributes = (start, end) => {
             const mergedPulls = this.pulls.filtedMerged(start, end);
-            const mergedTimeImage = new image_1.ImageMergedTime(mergedPulls);
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),

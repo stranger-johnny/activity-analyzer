@@ -27,28 +27,15 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls) {
         super(pulls);
     }
-    pullsWithMergeTime() {
-        const pulls = this.pulls.map((pull) => {
-            const mergedAt = new Date(pull.merged_at).getTime();
-            const createdAt = new Date(pull.created_at).getTime();
-            const diff = mergedAt - createdAt;
-            return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) };
-        });
-        return pulls.sort((a, b) => a.minutesNeedToMerge - b.minutesNeedToMerge);
-    }
-    mergedTimeAverage() {
-        const sumTime = (0, lodash_1.sumBy)(this.pullsWithMergeTime(), (pull) => {
-            return pull.minutesNeedToMerge;
-        });
-        return this.secondsToTime(sumTime / this.pulls.length);
-    }
-    mergedTimesPerPull() {
-        return this.pullsWithMergeTime().map((pull) => {
-            return {
-                number: `#${pull.number}`,
-                hours: this.secondsToHour(pull.minutesNeedToMerge),
-            };
-        });
+    mergedPullPerUser() {
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
+        return Object.entries(grouped).map(([_, pulls]) => ({
+            user: {
+                name: pulls[0]?.user?.login ?? '',
+                avator: pulls[0]?.user?.avatar_url ?? '',
+            },
+            pulls,
+        }));
     }
     secondsToTime(seconds) {
         const days = Math.floor(seconds / (24 * 60 * 60));
