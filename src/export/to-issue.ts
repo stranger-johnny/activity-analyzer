@@ -1,7 +1,9 @@
-import { ImageMergedTime } from '@/analyzed/image'
+import { OutputConfig } from '@/config/output-config'
+import { ImageMergedTime } from '@/export/image'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Time } from '@/types'
+import dayjs from 'dayjs'
 import * as fs from 'fs'
 import * as Mustache from 'mustache'
 
@@ -17,13 +19,14 @@ type AnalyzedTemplateAttributes = {
   }
 }
 
-export class Analyzed {
+export class ExportToIssue {
   public constructor(
     private gitHubClient: GitHubClient,
+    private config: OutputConfig,
     private pulls: PullsAnalyzer
   ) {}
 
-  public toIssue = async (start: Date, end: Date): Promise<void> => {
+  public do = async (start: Date, end: Date): Promise<void> => {
     await this.gitHubClient.octokit.issues.create({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
@@ -39,7 +42,14 @@ export class Analyzed {
   }
 
   private template = (): string => {
-    return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8')
+    switch (this.config.lang) {
+      case 'en':
+        return fs.readFileSync('src/analyzed/templates/en.mustache', 'utf-8')
+      case 'ja':
+        return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8')
+      default:
+        return fs.readFileSync('src/analyzed/templates/en.mustache', 'utf-8')
+    }
   }
 
   private templateAttributes = (
@@ -48,8 +58,8 @@ export class Analyzed {
   ): AnalyzedTemplateAttributes => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
     return {
-      startDate: start.toISOString(),
-      endDate: end.toISOString(),
+      startDate: dayjs(start).format('YYYY/MM/DD'),
+      endDate: dayjs(end).format('YYYY/MM/DD'),
       pulls: {
         merged: {
           count: mergedPulls.count(),

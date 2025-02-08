@@ -10,7 +10,7 @@ export class ImageMergedTime {
     return `
     xychart-beta
         x-axis "PR" [${xaxis}]
-        y-axis "PR Merge Time (hour)"
+        y-axis "PR merge time (hour)"
         bar [${bars}]
     `
   }

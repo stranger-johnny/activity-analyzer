@@ -4,10 +4,11 @@ import { z } from 'zod'
 
 const ConfigSchema = z.object({
   lang: z.union([z.literal('ja'), z.literal('en')]),
+  period: z.union([z.literal('last-1week'), z.literal('last-2week')]),
 })
-type Config = z.infer<typeof ConfigSchema>
+export type OutputConfig = z.infer<typeof ConfigSchema>
 
-export const loadInput = async (path: string): Promise<Config> => {
+export const loadInput = async (path: string): Promise<OutputConfig> => {
   try {
     const yamlData = await readFile(path, 'utf8')
     const data = load(yamlData)
@@ -15,6 +16,6 @@ export const loadInput = async (path: string): Promise<Config> => {
     const config = ConfigSchema.parse(data)
     return config
   } catch (error) {
-    throw error
+    throw new Error(`Failed to load config: ${error}`)
   }
 }

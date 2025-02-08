@@ -1,0 +1,23 @@
+# Activity analyzer
+
+## Period
+{{startDate}} ~ {{endDate}}
+
+{{#pulls}}
+## Pull Request
+
+{{#merged}}
+
+|マージされたissue数|マージするまでの平均時間|
+|---|---|
+|{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
+
+{{#chart}}
+```mermaid
+{{{chart}}}
+```
+{{/chart}}
+
+{{/merged}}
+
+{{/pulls}}
