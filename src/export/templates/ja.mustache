@@ -1,6 +1,6 @@
-# Activity analyzer
+# Activity Analyzer
 
-## Period
+## 期間
 {{{current.start}}} ~ {{{current.end}}}
 
 {{#pulls}}
@@ -8,14 +8,13 @@
 
 {{#merged}}
 
-### Current Period ({{{current.start}}} ~ {{{current.end}}})
 {{#current}}
 #### マージされたPR数（トータル）
-{{#count}}{{count}} PRs{{/count}}
+{{#count}}{{count}} PRs{{/count}} {{#previous.count}}(前の期間: {{previous.count}} PRs){{/previous.count}}
 
-#### ユーザーごとにマージされたPR数（ユーザーごと）
+#### マージされたPR数（ユーザーごと）
 
-| ユーザー | マージしたPR数 | マージしたPR |
+| ユーザー | マージされたPR数 | マージされたPR |
 | --- | --- | --- |
 {{#perUser}}
 | {{name}} | {{count}} PRs | {{#links}}{{{.}}}{{/links}} |
