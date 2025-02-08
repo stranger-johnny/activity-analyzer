@@ -1,8 +1,9 @@
-import * as Mustache from 'mustache'
-import * as fs from 'fs'
+import { ImageMergedTime } from '@/analyzed/image'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
-import { Pull, Time } from '@/types'
+import { Time } from '@/types'
+import * as fs from 'fs'
+import * as Mustache from 'mustache'
 
 type AnalyzedTemplateAttributes = {
   startDate: string
@@ -11,7 +12,7 @@ type AnalyzedTemplateAttributes = {
     merged: {
       count: number
       averageTime: Time
-      chart: { xaxis: `[${string}]`; bars: `[${string}]` }
+      chart: string
     }
   }
 }
@@ -24,11 +25,12 @@ export class Analyzed {
 
   public toIssue = async (start: Date, end: Date): Promise<void> => {
     try {
+      const attributes = await this.templateAttributes(start, end)
       await this.gitHubClient.octokit.issues.create({
         owner: this.gitHubClient.owner,
         repo: this.gitHubClient.repo,
         title: 'Analyzed by issue template',
-        body: this.convertToTemplate(this.templateAttributes(start, end)),
+        body: this.convertToTemplate(attributes),
       })
     } catch (error) {
       console.error('failed to create issue', error)
@@ -45,10 +47,10 @@ export class Analyzed {
     return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8')
   }
 
-  private templateAttributes = (
+  private templateAttributes = async (
     start: Date,
     end: Date
-  ): AnalyzedTemplateAttributes => {
+  ): Promise<AnalyzedTemplateAttributes> => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
     const mergedTime = mergedPulls.mergedTimesPerPull()
     return {
@@ -58,10 +60,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: {
-            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
-            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
-          },
+          chart: await new ImageMergedTime(mergedPulls).imageAsBase64(),
         },
       },
     }

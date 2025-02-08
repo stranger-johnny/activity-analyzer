@@ -1,8 +1,7 @@
-import { getInput } from '@actions/core'
-import { listPulls } from '@/pulls'
 import { Analyzed } from '@/analyzed/analyzed'
 import { createGitHubClient } from '@/octokit/github_client'
-import { loadInput } from '@/config/config'
+import { listPulls } from '@/pulls'
+import { getInput } from '@actions/core'
 
 const repo = getInput('repo', { required: true })
 if (!repo) {
@@ -22,10 +21,7 @@ if (!configPath) {
   process.exit(1)
 }
 
-console.log(process.env.GITHUB_WORKSPACE)
-
 async function run() {
-  console.log(await loadInput(configPath))
   const client = createGitHubClient(token!, repo!)
   const pulls = await listPulls(client)
 

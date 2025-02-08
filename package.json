@@ -38,6 +38,7 @@
     "@octokit/request-error": "^6.1.6",
     "@octokit/rest": "^21.1.0",
     "@vercel/ncc": "^0.38.3",
+    "chartjs-to-image": "^1.2.2",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "mustache": "^4.2.0",

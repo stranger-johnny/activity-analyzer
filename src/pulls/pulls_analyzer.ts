@@ -1,6 +1,5 @@
 import type { Pull, Time } from '@/types'
-import { close } from 'fs'
-import { sumBy, sortBy } from 'lodash'
+import { sumBy } from 'lodash'
 
 export class PullsAnalyzer {
   constructor(protected pulls: Pull[]) {}
@@ -23,7 +22,7 @@ export class PullsAnalyzer {
   }
 }
 
-class MergedPullsAnalyzer extends PullsAnalyzer {
+export class MergedPullsAnalyzer extends PullsAnalyzer {
   public constructor(pulls: Pull[]) {
     super(pulls)
   }
