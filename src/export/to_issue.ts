@@ -84,8 +84,11 @@ export class ExportToIssue {
           avator: user.user.avator,
           name: user.user.name,
           count: user.pulls.length,
-          links: user.pulls.map((pull, index) => {
-            return { index, url: `[${pull.title}](${pull.html_url})<br>` }
+          links: user.pulls.map((pull, i) => {
+            return {
+              index: i + 1,
+              url: `[${pull.title}](${pull.html_url})<br>`,
+            }
           }),
         })),
       }
@@ -102,8 +105,11 @@ export class ExportToIssue {
           avator: user.user.avator,
           name: user.user.name,
           count: user.pulls.length,
-          links: user.pulls.map((pull, index) => {
-            return { index, url: `[${pull.title}](${pull.html_url})<br>` }
+          links: user.pulls.map((pull, i) => {
+            return {
+              index: i + 1,
+              url: `[${pull.title}](${pull.html_url})<br>`,
+            }
           }),
         })),
       }

@@ -10,7 +10,7 @@
 
 {{#current}}
 #### マージされたPR数（トータル）
-{{#count}}{{count}} PRs{{/count}} {{#previous.count}}(前の期間: {{previous.count}} PRs){{/previous.count}}
+{{#count}}{{count}} PRs{{/count}} {{#previous}}{{#count}}(前の期間: {{count}} PRs){{/count}}{{/previous}}
 
 #### マージされたPR数（ユーザーごと）
 
