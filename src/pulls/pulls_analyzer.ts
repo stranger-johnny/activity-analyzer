@@ -28,7 +28,7 @@ export class MergedPullsAnalyzer extends PullsAnalyzer {
   }
 
   public mergedPullPerUser(): { user: string; pulls: Pull[] }[] {
-    const grouped = groupBy(this.pulls, (pull) => pull.user)
+    const grouped = groupBy(this.pulls, (pull) => pull.user?.name ?? 'unknown')
     return Object.entries(grouped).map(([user, pulls]) => ({
       user,
       pulls,

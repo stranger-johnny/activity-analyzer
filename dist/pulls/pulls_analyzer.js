@@ -28,7 +28,7 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         super(pulls);
     }
     mergedPullPerUser() {
-        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user);
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.name ?? 'unknown');
         return Object.entries(grouped).map(([user, pulls]) => ({
             user,
             pulls,
