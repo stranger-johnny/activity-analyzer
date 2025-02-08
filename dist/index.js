@@ -52271,7 +52271,7 @@ exports.NEVER = parseUtil_1.INVALID;
 
 /***/ }),
 
-/***/ 108:
+/***/ 3798:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -52358,7 +52358,7 @@ exports.MergedTimeChart = MergedTimeChart;
 
 /***/ }),
 
-/***/ 7795:
+/***/ 9037:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -52567,6 +52567,12 @@ class PullsClient {
         this.gitHubClient = gitHubClient;
     }
     async collect() {
+        const { data: events } = await this.gitHubClient.octokit.issues.listEvents({
+            owner: this.gitHubClient.owner,
+            repo: this.gitHubClient.repo,
+            issue_number: 1,
+        });
+        console.log(events);
         return await this.gitHubClient.octokit.paginate(this.gitHubClient.octokit.rest.pulls.list, {
             owner: this.gitHubClient.owner,
             repo: this.gitHubClient.repo,
@@ -58453,8 +58459,8 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const output_config_1 = __nccwpck_require__(108);
-const to_issue_1 = __nccwpck_require__(7795);
+const output_config_1 = __nccwpck_require__(3798);
+const to_issue_1 = __nccwpck_require__(9037);
 const github_client_1 = __nccwpck_require__(5262);
 const pulls_1 = __nccwpck_require__(7600);
 const core_1 = __nccwpck_require__(7484);

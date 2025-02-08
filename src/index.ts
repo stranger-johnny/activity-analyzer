@@ -1,5 +1,5 @@
-import { loadInput } from '@/config/output-config'
-import { ExportToIssue } from '@/export/to-issue'
+import { loadInput } from '@/config/output_config'
+import { ExportToIssue } from '@/export/to_issue'
 import { createGitHubClient } from '@/octokit/github_client'
 import { listPulls } from '@/pulls'
 import { getInput } from '@actions/core'
