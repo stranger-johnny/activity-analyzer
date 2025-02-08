@@ -25,12 +25,11 @@ export class Analyzed {
 
   public toIssue = async (start: Date, end: Date): Promise<void> => {
     try {
-      const attributes = await this.templateAttributes(start, end)
       await this.gitHubClient.octokit.issues.create({
         owner: this.gitHubClient.owner,
         repo: this.gitHubClient.repo,
         title: 'Analyzed by issue template',
-        body: this.convertToTemplate(attributes),
+        body: this.convertToTemplate(this.templateAttributes(start, end)),
       })
     } catch (error) {
       console.error('failed to create issue', error)
@@ -47,22 +46,12 @@ export class Analyzed {
     return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8')
   }
 
-  private templateAttributes = async (
+  private templateAttributes = (
     start: Date,
     end: Date
-  ): Promise<AnalyzedTemplateAttributes> => {
+  ): AnalyzedTemplateAttributes => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
     const mergedTimeImage = new ImageMergedTime(mergedPulls)
-
-    const res = await this.gitHubClient.octokit.rest.git.createBlob({
-      owner: this.gitHubClient.owner,
-      repo: this.gitHubClient.repo,
-      content: await mergedTimeImage.imageAsBase64(),
-      encoding: 'base64',
-    })
-
-    console.log(res)
-
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -70,7 +59,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: `<img src="${res.url}" />`,
+          chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
         },
       },
     }

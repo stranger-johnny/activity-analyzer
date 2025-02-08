@@ -2,5 +2,5 @@ import { MergedPullsAnalyzer } from '@/pulls/pulls_analyzer';
 export declare class ImageMergedTime {
     private pulls;
     constructor(pulls: MergedPullsAnalyzer);
-    imageAsBase64(): Promise<string>;
+    asMarmaidContents: () => string;
 }
