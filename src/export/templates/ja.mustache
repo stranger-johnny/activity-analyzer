@@ -18,7 +18,7 @@
 | ユーザー | マージしたPR数 | マージしたPR |
 | --- | --- | --- |
 {{#perUser}}
-| <img src="{{avator}}" width="32"> {{name}} | {{count}} PRs | {{{links}}} |
+| {{name}} | {{count}} PRs | {{#links}}{{@index}}. {{links}}{{/links}} |
 {{/perUser}}
 
 {{/current}}
