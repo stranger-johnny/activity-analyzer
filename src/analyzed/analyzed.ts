@@ -52,7 +52,8 @@ export class Analyzed {
     end: Date
   ): Promise<AnalyzedTemplateAttributes> => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
-    console.log(await new ImageMergedTime(mergedPulls).imageAsBase64())
+    const mergedTimeImage = new ImageMergedTime(mergedPulls)
+    console.log(await mergedTimeImage.imageAsBase64())
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -60,7 +61,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: await new ImageMergedTime(mergedPulls).imageAsBase64(),
+          chart: await mergedTimeImage.imageAsBase64(),
         },
       },
     }
