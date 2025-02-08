@@ -8,11 +8,9 @@
 
 {{#merged}}
 
-### Current period ({{{current.start}}} ~ {{{current.end}}})
-{{#current}}
-|マージされたissue数|マージするまでの平均時間|
-|---|---|
-|{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
+### Current Period ({{{current.start}}} ~ {{{current.end}}})
+#### マージされたPR数
+{{#count}}{{count}} issue{{/count}}
 
 {{#chart}}
 ```mermaid
@@ -21,14 +19,12 @@
 {{/chart}}
 {{/current}}
 {{^current}}
-期間内にマージされたissueがありませんでした。
+期間内にマージされたPRがありませんでした。
 {{/current}}
 
-### Previous period ({{{previous.start}}} ~ {{{previous.end}}})
-{{#previous}}
-|マージされたissue数|マージするまでの平均時間|
-|---|---|
-|{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
+### Previous Period ({{{previous.start}}} ~ {{{previous.end}}})
+#### マージされたPR数
+{{#count}}{{count}} issue{{/count}}
 
 {{#chart}}
 ```mermaid
@@ -37,7 +33,7 @@
 {{/chart}}
 {{/previous}}
 {{^previous}}
-前の期間内にマージされたissueがありませんでした。
+前の期間内にマージされたPRがありませんでした。
 {{/previous}}
 
 {{/merged}}

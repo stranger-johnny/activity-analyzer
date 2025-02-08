@@ -52336,24 +52336,24 @@ exports.loadInput = loadInput;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MergedTimeChart = void 0;
-class MergedTimeChart {
+exports.MergedPerUserChart = void 0;
+class MergedPerUserChart {
     constructor(pulls) {
         this.pulls = pulls;
         this.asMarmaidContents = () => {
-            const mergedTimesPerPull = this.pulls.mergedTimesPerPull();
-            const xaxis = mergedTimesPerPull.map((pull) => pull.number).join(',');
-            const bars = mergedTimesPerPull.map((pull) => pull.hours).join(',');
+            const mergedPullPerUser = this.pulls.mergedPullPerUser();
+            const xaxis = mergedPullPerUser.map((pull) => pull.user).join(',');
+            const bars = mergedPullPerUser.map((pull) => pull.pulls.length).join(',');
             return `
     xychart-beta
-        x-axis "PR" [${xaxis}]
-        y-axis "PR merge time (hour)"
+        x-axis "User" [${xaxis}]
+        y-axis "Number of Merge PRs"
         bar [${bars}]
     `;
         };
     }
 }
-exports.MergedTimeChart = MergedTimeChart;
+exports.MergedPerUserChart = MergedPerUserChart;
 
 
 /***/ }),
@@ -52406,8 +52406,7 @@ class ExportToIssue {
                 }
                 return {
                     count: mergedPulls.count(),
-                    averageTime: mergedPulls.mergedTimeAverage(),
-                    chart: new chart_1.MergedTimeChart(mergedPulls).asMarmaidContents(),
+                    chart: new chart_1.MergedPerUserChart(mergedPulls).asMarmaidContents(),
                 };
             })();
             const previousPulls = (() => {
@@ -52417,8 +52416,7 @@ class ExportToIssue {
                 }
                 return {
                     count: mergedPulls.count(),
-                    averageTime: mergedPulls.mergedTimeAverage(),
-                    chart: new chart_1.MergedTimeChart(mergedPulls).asMarmaidContents(),
+                    chart: new chart_1.MergedPerUserChart(mergedPulls).asMarmaidContents(),
                 };
             })();
             return {
@@ -52517,28 +52515,12 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls) {
         super(pulls);
     }
-    pullsWithMergeTime() {
-        const pulls = this.pulls.map((pull) => {
-            const mergedAt = new Date(pull.merged_at).getTime();
-            const createdAt = new Date(pull.created_at).getTime();
-            const diff = mergedAt - createdAt;
-            return { ...pull, minutesNeedToMerge: Math.floor(diff / 1000) };
-        });
-        return pulls.sort((a, b) => a.minutesNeedToMerge - b.minutesNeedToMerge);
-    }
-    mergedTimeAverage() {
-        const sumTime = (0, lodash_1.sumBy)(this.pullsWithMergeTime(), (pull) => {
-            return pull.minutesNeedToMerge;
-        });
-        return this.secondsToTime(sumTime / this.pulls.length);
-    }
-    mergedTimesPerPull() {
-        return this.pullsWithMergeTime().map((pull) => {
-            return {
-                number: `#${pull.number}`,
-                hours: this.secondsToHour(pull.minutesNeedToMerge),
-            };
-        });
+    mergedPullPerUser() {
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user);
+        return Object.entries(grouped).map(([user, pulls]) => ({
+            user,
+            pulls,
+        }));
     }
     secondsToTime(seconds) {
         const days = Math.floor(seconds / (24 * 60 * 60));
