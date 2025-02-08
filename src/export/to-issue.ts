@@ -4,8 +4,8 @@ import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Time } from '@/types'
 import dayjs from 'dayjs'
-import * as fs from 'fs'
-import * as Mustache from 'mustache'
+import { readFileSync } from 'fs'
+import { render } from 'mustache'
 
 type AnalyzedTemplateAttributes = {
   startDate: string
@@ -26,40 +26,40 @@ export class ExportToIssue {
     private pulls: PullsAnalyzer
   ) {}
 
-  public do = async (start: Date, end: Date): Promise<void> => {
+  public do = async (): Promise<void> => {
     await this.gitHubClient.octokit.issues.create({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
       title: 'Analyzed by issue template',
-      body: this.convertToTemplate(this.templateAttributes(start, end)),
+      body: this.convertToTemplate(this.templateAttributes()),
     })
   }
 
   private convertToTemplate = (
     attributes: AnalyzedTemplateAttributes
   ): string => {
-    return Mustache.render(this.template(), attributes)
+    return render(this.template(), attributes)
   }
 
   private template = (): string => {
     switch (this.config.lang) {
       case 'en':
-        return fs.readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync('src/export/templates/en.mustache', 'utf-8')
       case 'ja':
-        return fs.readFileSync('src/export/templates/ja.mustache', 'utf-8')
+        return readFileSync('src/export/templates/ja.mustache', 'utf-8')
       default:
-        return fs.readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync('src/export/templates/en.mustache', 'utf-8')
     }
   }
 
-  private templateAttributes = (
-    start: Date,
-    end: Date
-  ): AnalyzedTemplateAttributes => {
-    const mergedPulls = this.pulls.filtedMerged(start, end)
+  private templateAttributes = (): AnalyzedTemplateAttributes => {
+    const mergedPulls = this.pulls.filtedMerged(
+      this.config.startDate,
+      this.config.endDate
+    )
     return {
-      startDate: dayjs(start).format('YYYY/MM/DD'),
-      endDate: dayjs(end).format('YYYY/MM/DD'),
+      startDate: dayjs(this.config.startDate).format('YYYY/MM/DD'),
+      endDate: dayjs(this.config.endDate).format('YYYY/MM/DD'),
       pulls: {
         merged: {
           count: mergedPulls.count(),

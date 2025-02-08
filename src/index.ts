@@ -29,7 +29,7 @@ async function run() {
   const pulls = await listPulls(client)
 
   const exportToIssue = new ExportToIssue(client, config, pulls)
-  await exportToIssue.do(new Date('2025-01-01'), new Date('2025-12-31'))
+  await exportToIssue.do()
 }
 
 ;(async () => await run())()

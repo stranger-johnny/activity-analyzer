@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loadInput = void 0;
+const dayjs_1 = __importDefault(require("dayjs"));
 const promises_1 = require("fs/promises");
 const js_yaml_1 = require("js-yaml");
 const zod_1 = require("zod");
@@ -13,7 +17,20 @@ const loadInput = async (path) => {
         const yamlData = await (0, promises_1.readFile)(path, 'utf8');
         const data = (0, js_yaml_1.load)(yamlData);
         const config = ConfigSchema.parse(data);
-        return config;
+        switch (config.period) {
+            case 'last-1week':
+                return {
+                    ...config,
+                    startDate: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    endDate: (0, dayjs_1.default)().toDate(),
+                };
+            case 'last-2week':
+                return {
+                    ...config,
+                    startDate: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                    endDate: (0, dayjs_1.default)().toDate(),
+                };
+        }
     }
     catch (error) {
         throw new Error(`Failed to load config: ${error}`);

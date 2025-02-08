@@ -52272,12 +52272,16 @@ exports.NEVER = parseUtil_1.INVALID;
 /***/ }),
 
 /***/ 108:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.loadInput = void 0;
+const dayjs_1 = __importDefault(__nccwpck_require__(3706));
 const promises_1 = __nccwpck_require__(1943);
 const js_yaml_1 = __nccwpck_require__(4281);
 const zod_1 = __nccwpck_require__(4809);
@@ -52290,7 +52294,20 @@ const loadInput = async (path) => {
         const yamlData = await (0, promises_1.readFile)(path, 'utf8');
         const data = (0, js_yaml_1.load)(yamlData);
         const config = ConfigSchema.parse(data);
-        return config;
+        switch (config.period) {
+            case 'last-1week':
+                return {
+                    ...config,
+                    startDate: (0, dayjs_1.default)().subtract(1, 'week').toDate(),
+                    endDate: (0, dayjs_1.default)().toDate(),
+                };
+            case 'last-2week':
+                return {
+                    ...config,
+                    startDate: (0, dayjs_1.default)().subtract(2, 'week').toDate(),
+                    endDate: (0, dayjs_1.default)().toDate(),
+                };
+        }
     }
     catch (error) {
         throw new Error(`Failed to load config: ${error}`);
@@ -52334,39 +52351,6 @@ exports.ImageMergedTime = ImageMergedTime;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -52374,39 +52358,39 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ExportToIssue = void 0;
 const image_1 = __nccwpck_require__(59);
 const dayjs_1 = __importDefault(__nccwpck_require__(3706));
-const fs = __importStar(__nccwpck_require__(9896));
-const Mustache = __importStar(__nccwpck_require__(2374));
+const fs_1 = __nccwpck_require__(9896);
+const mustache_1 = __nccwpck_require__(2374);
 class ExportToIssue {
     constructor(gitHubClient, config, pulls) {
         this.gitHubClient = gitHubClient;
         this.config = config;
         this.pulls = pulls;
-        this.do = async (start, end) => {
+        this.do = async () => {
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
                 title: 'Analyzed by issue template',
-                body: this.convertToTemplate(this.templateAttributes(start, end)),
+                body: this.convertToTemplate(this.templateAttributes()),
             });
         };
         this.convertToTemplate = (attributes) => {
-            return Mustache.render(this.template(), attributes);
+            return (0, mustache_1.render)(this.template(), attributes);
         };
         this.template = () => {
             switch (this.config.lang) {
                 case 'en':
-                    return fs.readFileSync('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
                 case 'ja':
-                    return fs.readFileSync('src/export/templates/ja.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)('src/export/templates/ja.mustache', 'utf-8');
                 default:
-                    return fs.readFileSync('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
             }
         };
-        this.templateAttributes = (start, end) => {
-            const mergedPulls = this.pulls.filtedMerged(start, end);
+        this.templateAttributes = () => {
+            const mergedPulls = this.pulls.filtedMerged(this.config.startDate, this.config.endDate);
             return {
-                startDate: (0, dayjs_1.default)(start).format('YYYY/MM/DD'),
-                endDate: (0, dayjs_1.default)(end).format('YYYY/MM/DD'),
+                startDate: (0, dayjs_1.default)(this.config.startDate).format('YYYY/MM/DD'),
+                endDate: (0, dayjs_1.default)(this.config.endDate).format('YYYY/MM/DD'),
                 pulls: {
                     merged: {
                         count: mergedPulls.count(),
@@ -58456,7 +58440,7 @@ async function run() {
     const client = (0, github_client_1.createGitHubClient)(token, repo);
     const pulls = await (0, pulls_1.listPulls)(client);
     const exportToIssue = new to_issue_1.ExportToIssue(client, config, pulls);
-    await exportToIssue.do(new Date('2025-01-01'), new Date('2025-12-31'));
+    await exportToIssue.do();
 }
 ;
 (async () => await run())();

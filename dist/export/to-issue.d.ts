@@ -6,7 +6,7 @@ export declare class ExportToIssue {
     private config;
     private pulls;
     constructor(gitHubClient: GitHubClient, config: OutputConfig, pulls: PullsAnalyzer);
-    do: (start: Date, end: Date) => Promise<void>;
+    do: () => Promise<void>;
     private convertToTemplate;
     private template;
     private templateAttributes;

@@ -9,6 +9,10 @@ declare const ConfigSchema: z.ZodObject<{
     lang: "ja" | "en";
     period: "last-1week" | "last-2week";
 }>;
-export type OutputConfig = z.infer<typeof ConfigSchema>;
+type Config = z.infer<typeof ConfigSchema>;
+export type OutputConfig = Config & {
+    startDate: Date;
+    endDate: Date;
+};
 export declare const loadInput: (path: string) => Promise<OutputConfig>;
 export {};
