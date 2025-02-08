@@ -60,11 +60,11 @@ class ExportToIssue {
         this.template = () => {
             switch (this.config.lang) {
                 case 'en':
-                    return fs.readFileSync('src/analyzed/templates/en.mustache', 'utf-8');
+                    return fs.readFileSync('src/export/templates/en.mustache', 'utf-8');
                 case 'ja':
-                    return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
+                    return fs.readFileSync('src/export/templates/ja.mustache', 'utf-8');
                 default:
-                    return fs.readFileSync('src/analyzed/templates/en.mustache', 'utf-8');
+                    return fs.readFileSync('src/export/templates/en.mustache', 'utf-8');
             }
         };
         this.templateAttributes = (start, end) => {
