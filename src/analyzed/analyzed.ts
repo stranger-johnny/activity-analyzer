@@ -24,16 +24,12 @@ export class Analyzed {
   ) {}
 
   public toIssue = async (start: Date, end: Date): Promise<void> => {
-    try {
-      await this.gitHubClient.octokit.issues.create({
-        owner: this.gitHubClient.owner,
-        repo: this.gitHubClient.repo,
-        title: 'Analyzed by issue template',
-        body: this.convertToTemplate(this.templateAttributes(start, end)),
-      })
-    } catch (error) {
-      console.error('failed to create issue', error)
-    }
+    await this.gitHubClient.octokit.issues.create({
+      owner: this.gitHubClient.owner,
+      repo: this.gitHubClient.repo,
+      title: 'Analyzed by issue template',
+      body: this.convertToTemplate(this.templateAttributes(start, end)),
+    })
   }
 
   private convertToTemplate = (
@@ -51,7 +47,6 @@ export class Analyzed {
     end: Date
   ): AnalyzedTemplateAttributes => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
-    const mergedTimeImage = new ImageMergedTime(mergedPulls)
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
