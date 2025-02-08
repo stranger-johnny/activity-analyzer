@@ -29,8 +29,4 @@ async function run() {
   await analyzed.toIssue(new Date('2025-01-01'), new Date('2025-12-31'))
 }
 
-try {
-  run()
-} catch (error) {
-  console.error(error)
-}
+;(async () => await run())()
