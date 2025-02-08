@@ -38,6 +38,8 @@ class ExportToIssue {
             const currentPeriodPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
                 return {
+                    start: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
+                    end: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
@@ -48,6 +50,8 @@ class ExportToIssue {
             const previousPeriodPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
                 return {
+                    start: (0, dayjs_1.default)(this.config.previous.start).format('YYYY/MM/DD'),
+                    end: (0, dayjs_1.default)(this.config.previous.end).format('YYYY/MM/DD'),
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
@@ -56,8 +60,8 @@ class ExportToIssue {
                 };
             })();
             return {
-                startDate: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
-                endDate: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
+                start: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
+                end: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
                 pulls: {
                     current: { ...currentPeriodPulls },
                     previous: { ...previousPeriodPulls },

@@ -8,10 +8,12 @@ import { readFileSync } from 'fs'
 import { render } from 'mustache'
 
 type AnalyzedTemplateAttributes = {
-  startDate: string
-  endDate: string
+  start: string
+  end: string
   pulls: {
     current: {
+      start: string
+      end: string
       merged: {
         count: number
         averageTime: Time
@@ -19,6 +21,8 @@ type AnalyzedTemplateAttributes = {
       }
     }
     previous: {
+      start: string
+      end: string
       merged: {
         count: number
         averageTime: Time
@@ -68,6 +72,8 @@ export class ExportToIssue {
         this.config.current.end
       )
       return {
+        start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
+        end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
@@ -81,6 +87,8 @@ export class ExportToIssue {
         this.config.previous.end
       )
       return {
+        start: dayjs(this.config.previous.start).format('YYYY/MM/DD'),
+        end: dayjs(this.config.previous.end).format('YYYY/MM/DD'),
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
@@ -89,8 +97,8 @@ export class ExportToIssue {
       }
     })()
     return {
-      startDate: dayjs(this.config.current.start).format('YYYY/MM/DD'),
-      endDate: dayjs(this.config.current.end).format('YYYY/MM/DD'),
+      start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
+      end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
       pulls: {
         current: { ...currentPeriodPulls },
         previous: { ...previousPeriodPulls },

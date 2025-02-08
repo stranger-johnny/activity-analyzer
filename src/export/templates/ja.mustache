@@ -1,13 +1,15 @@
 # Activity analyzer
 
 ## Period
-{{startDate}} ~ {{endDate}}
+{{{start}}} ~ {{{end}}}
 
 {{#pulls}}
 ## Pull Request
 
 {{#merged}}
 
+{{#current}}
+### Current period ({{{start}}} ~ {{{end}}})
 |マージされたissue数|マージするまでの平均時間|
 |---|---|
 |{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
@@ -17,6 +19,20 @@
 {{{chart}}}
 ```
 {{/chart}}
+{{/current}}
+
+{{#previous}}
+### Previous period ({{{start}}} ~ {{{end}}})
+|マージされたissue数|マージするまでの平均時間|
+|---|---|
+|{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
+
+{{#chart}}
+```mermaid
+{{{chart}}}
+```
+{{/chart}}
+{{/previous}}
 
 {{/merged}}
 
