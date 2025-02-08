@@ -34,19 +34,22 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Analyzed = void 0;
-const Mustache = __importStar(require("mustache"));
+const image_1 = require("@/analyzed/image");
+const core = __importStar(require("@actions/core"));
 const fs = __importStar(require("fs"));
+const Mustache = __importStar(require("mustache"));
 class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
         this.pulls = pulls;
         this.toIssue = async (start, end) => {
             try {
+                const attributes = await this.templateAttributes(start, end);
                 await this.gitHubClient.octokit.issues.create({
                     owner: this.gitHubClient.owner,
                     repo: this.gitHubClient.repo,
                     title: 'Analyzed by issue template',
-                    body: this.convertToTemplate(this.templateAttributes(start, end)),
+                    body: this.convertToTemplate(attributes),
                 });
             }
             catch (error) {
@@ -59,9 +62,11 @@ class Analyzed {
         this.template = () => {
             return fs.readFileSync('src/analyzed/templates/ja.mustache', 'utf-8');
         };
-        this.templateAttributes = (start, end) => {
+        this.templateAttributes = async (start, end) => {
             const mergedPulls = this.pulls.filtedMerged(start, end);
-            const mergedTime = mergedPulls.mergedTimesPerPull();
+            const mergedTimeImage = new image_1.ImageMergedTime(mergedPulls);
+            console.log(await mergedTimeImage.imageAsBase64());
+            core.setOutput('chart', await mergedTimeImage.imageAsBase64());
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
@@ -69,10 +74,7 @@ class Analyzed {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
-                        chart: {
-                            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
-                            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
-                        },
+                        chart: await mergedTimeImage.imageAsBase64(),
                     },
                 },
             };
