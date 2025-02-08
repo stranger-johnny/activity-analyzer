@@ -1,15 +1,15 @@
 # Activity analyzer
 
 ## Period
-{{{start}}} ~ {{{end}}}
+{{{current.start}}} ~ {{{current.end}}}
 
 {{#pulls}}
 ## Pull Request
 
 {{#merged}}
 
+### Current period ({{{current.start}}} ~ {{{current.end}}})
 {{#current}}
-### Current period ({{{start}}} ~ {{{end}}})
 |マージされたissue数|マージするまでの平均時間|
 |---|---|
 |{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
@@ -20,9 +20,12 @@
 ```
 {{/chart}}
 {{/current}}
+{{^current}}
+期間内にマージされたissueがありませんでした。
+{{/current}}
 
+### Previous period ({{{previous.start}}} ~ {{{previous.end}}})
 {{#previous}}
-### Previous period ({{{start}}} ~ {{{end}}})
 |マージされたissue数|マージするまでの平均時間|
 |---|---|
 |{{#count}}{{count}} issue{{/count}}|{{#averageTime}}{{#days}}{{days}} 日{{/days}}{{#hours}} {{hours}} 時間{{/hours}}{{#minutes}} {{minutes}} 分{{/minutes}}{{/averageTime}}|
@@ -32,6 +35,9 @@
 {{{chart}}}
 ```
 {{/chart}}
+{{/previous}}
+{{^previous}}
+前の期間内にマージされたissueがありませんでした。
 {{/previous}}
 
 {{/merged}}

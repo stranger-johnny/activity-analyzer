@@ -52399,16 +52399,22 @@ class ExportToIssue {
             }
         };
         this.templateAttributes = () => {
-            const currentPeriodPulls = (() => {
+            const currentPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
+                if (mergedPulls.count() === 0) {
+                    return undefined;
+                }
                 return {
                     count: mergedPulls.count(),
                     averageTime: mergedPulls.mergedTimeAverage(),
                     chart: new chart_1.MergedTimeChart(mergedPulls).asMarmaidContents(),
                 };
             })();
-            const previousPeriodPulls = (() => {
+            const previousPulls = (() => {
                 const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
+                if (mergedPulls.count() === 0) {
+                    return undefined;
+                }
                 return {
                     count: mergedPulls.count(),
                     averageTime: mergedPulls.mergedTimeAverage(),
@@ -52416,12 +52422,18 @@ class ExportToIssue {
                 };
             })();
             return {
-                start: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
-                end: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
+                current: {
+                    start: (0, dayjs_1.default)(this.config.current.start).format('YYYY/MM/DD'),
+                    end: (0, dayjs_1.default)(this.config.current.end).format('YYYY/MM/DD'),
+                },
+                previous: {
+                    start: (0, dayjs_1.default)(this.config.previous.start).format('YYYY/MM/DD'),
+                    end: (0, dayjs_1.default)(this.config.previous.end).format('YYYY/MM/DD'),
+                },
                 pulls: {
                     merged: {
-                        current: { ...currentPeriodPulls },
-                        previous: { ...previousPeriodPulls },
+                        current: currentPulls ? { ...currentPulls } : undefined,
+                        previous: previousPulls ? { ...previousPulls } : undefined,
                     },
                 },
             };

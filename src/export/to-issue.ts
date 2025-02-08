@@ -8,16 +8,22 @@ import { readFileSync } from 'fs'
 import { render } from 'mustache'
 
 type AnalyzedTemplateAttributes = {
-  start: string
-  end: string
+  current: {
+    start: string
+    end: string
+  }
+  previous: {
+    start: string
+    end: string
+  }
   pulls: {
     merged: {
-      current: {
+      current?: {
         count: number
         averageTime: Time
         chart: string
       }
-      previous: {
+      previous?: {
         count: number
         averageTime: Time
         chart: string
@@ -60,22 +66,28 @@ export class ExportToIssue {
   }
 
   private templateAttributes = (): AnalyzedTemplateAttributes => {
-    const currentPeriodPulls = (() => {
+    const currentPulls = (() => {
       const mergedPulls = this.pulls.filtedMerged(
         this.config.current.start,
         this.config.current.end
       )
+      if (mergedPulls.count() === 0) {
+        return undefined
+      }
       return {
         count: mergedPulls.count(),
         averageTime: mergedPulls.mergedTimeAverage(),
         chart: new MergedTimeChart(mergedPulls).asMarmaidContents(),
       }
     })()
-    const previousPeriodPulls = (() => {
+    const previousPulls = (() => {
       const mergedPulls = this.pulls.filtedMerged(
         this.config.previous.start,
         this.config.previous.end
       )
+      if (mergedPulls.count() === 0) {
+        return undefined
+      }
       return {
         count: mergedPulls.count(),
         averageTime: mergedPulls.mergedTimeAverage(),
@@ -83,12 +95,18 @@ export class ExportToIssue {
       }
     })()
     return {
-      start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
-      end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
+      current: {
+        start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
+        end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
+      },
+      previous: {
+        start: dayjs(this.config.previous.start).format('YYYY/MM/DD'),
+        end: dayjs(this.config.previous.end).format('YYYY/MM/DD'),
+      },
       pulls: {
         merged: {
-          current: { ...currentPeriodPulls },
-          previous: { ...previousPeriodPulls },
+          current: currentPulls ? { ...currentPulls } : undefined,
+          previous: previousPulls ? { ...previousPulls } : undefined,
         },
       },
     }
