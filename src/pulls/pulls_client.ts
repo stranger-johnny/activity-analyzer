@@ -8,7 +8,7 @@ export class PullsClient {
     const { data: events } = await this.gitHubClient.octokit.issues.listEvents({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
-      issue_number: 1,
+      issue_number: 2,
     })
     console.log(events)
 
