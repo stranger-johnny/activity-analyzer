@@ -1,5 +1,5 @@
 import { OutputConfig } from '@/config/output-config'
-import { ImageMergedTime } from '@/export/image'
+import { MergedTimeChart } from '@/export/chart'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
 import { Time } from '@/types'
@@ -11,19 +11,13 @@ type AnalyzedTemplateAttributes = {
   start: string
   end: string
   pulls: {
-    current: {
-      start: string
-      end: string
-      merged: {
+    merged: {
+      current: {
         count: number
         averageTime: Time
         chart: string
       }
-    }
-    previous: {
-      start: string
-      end: string
-      merged: {
+      previous: {
         count: number
         averageTime: Time
         chart: string
@@ -72,13 +66,9 @@ export class ExportToIssue {
         this.config.current.end
       )
       return {
-        start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
-        end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
-        merged: {
-          count: mergedPulls.count(),
-          averageTime: mergedPulls.mergedTimeAverage(),
-          chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
-        },
+        count: mergedPulls.count(),
+        averageTime: mergedPulls.mergedTimeAverage(),
+        chart: new MergedTimeChart(mergedPulls).asMarmaidContents(),
       }
     })()
     const previousPeriodPulls = (() => {
@@ -87,21 +77,19 @@ export class ExportToIssue {
         this.config.previous.end
       )
       return {
-        start: dayjs(this.config.previous.start).format('YYYY/MM/DD'),
-        end: dayjs(this.config.previous.end).format('YYYY/MM/DD'),
-        merged: {
-          count: mergedPulls.count(),
-          averageTime: mergedPulls.mergedTimeAverage(),
-          chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
-        },
+        count: mergedPulls.count(),
+        averageTime: mergedPulls.mergedTimeAverage(),
+        chart: new MergedTimeChart(mergedPulls).asMarmaidContents(),
       }
     })()
     return {
       start: dayjs(this.config.current.start).format('YYYY/MM/DD'),
       end: dayjs(this.config.current.end).format('YYYY/MM/DD'),
       pulls: {
-        current: { ...currentPeriodPulls },
-        previous: { ...previousPeriodPulls },
+        merged: {
+          current: { ...currentPeriodPulls },
+          previous: { ...previousPeriodPulls },
+        },
       },
     }
   }
