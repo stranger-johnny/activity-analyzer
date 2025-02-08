@@ -6,7 +6,7 @@ export declare class PullsAnalyzer {
     count(): number;
     filtedMerged(start: Date, end: Date): MergedPullsAnalyzer;
 }
-declare class MergedPullsAnalyzer extends PullsAnalyzer {
+export declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
     private pullsWithMergeTime;
     mergedTimeAverage(): Time;
@@ -17,4 +17,3 @@ declare class MergedPullsAnalyzer extends PullsAnalyzer {
     private secondsToTime;
     private secondsToHour;
 }
-export {};

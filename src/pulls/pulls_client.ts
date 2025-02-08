@@ -1,5 +1,5 @@
-import { Pull } from '@/types'
 import { GitHubClient } from '@/octokit/github_client'
+import { Pull } from '@/types'
 
 export class PullsClient {
   constructor(private gitHubClient: GitHubClient) {}

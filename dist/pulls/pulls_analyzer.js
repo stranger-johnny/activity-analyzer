@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PullsAnalyzer = void 0;
+exports.MergedPullsAnalyzer = exports.PullsAnalyzer = void 0;
 const lodash_1 = require("lodash");
 class PullsAnalyzer {
     constructor(pulls) {
@@ -60,4 +60,5 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         return seconds / (60 * 60);
     }
 }
+exports.MergedPullsAnalyzer = MergedPullsAnalyzer;
 //# sourceMappingURL=pulls_analyzer.js.map

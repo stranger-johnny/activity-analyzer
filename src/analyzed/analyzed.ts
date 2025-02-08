@@ -1,8 +1,9 @@
-import * as Mustache from 'mustache'
-import * as fs from 'fs'
+import { ImageMergedTime } from '@/analyzed/image'
 import { GitHubClient } from '@/octokit/github_client'
 import { PullsAnalyzer } from '@/pulls/pulls_analyzer'
-import { Pull, Time } from '@/types'
+import { Time } from '@/types'
+import * as fs from 'fs'
+import * as Mustache from 'mustache'
 
 type AnalyzedTemplateAttributes = {
   startDate: string
@@ -11,7 +12,7 @@ type AnalyzedTemplateAttributes = {
     merged: {
       count: number
       averageTime: Time
-      chart: { xaxis: `[${string}]`; bars: `[${string}]` }
+      chart: string
     }
   }
 }
@@ -50,7 +51,7 @@ export class Analyzed {
     end: Date
   ): AnalyzedTemplateAttributes => {
     const mergedPulls = this.pulls.filtedMerged(start, end)
-    const mergedTime = mergedPulls.mergedTimesPerPull()
+    const mergedTimeImage = new ImageMergedTime(mergedPulls)
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -58,10 +59,7 @@ export class Analyzed {
         merged: {
           count: mergedPulls.count(),
           averageTime: mergedPulls.mergedTimeAverage(),
-          chart: {
-            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
-            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
-          },
+          chart: new ImageMergedTime(mergedPulls).asMarmaidContents(),
         },
       },
     }

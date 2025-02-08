@@ -34,8 +34,9 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Analyzed = void 0;
-const Mustache = __importStar(require("mustache"));
+const image_1 = require("@/analyzed/image");
 const fs = __importStar(require("fs"));
+const Mustache = __importStar(require("mustache"));
 class Analyzed {
     constructor(gitHubClient, pulls) {
         this.gitHubClient = gitHubClient;
@@ -61,7 +62,7 @@ class Analyzed {
         };
         this.templateAttributes = (start, end) => {
             const mergedPulls = this.pulls.filtedMerged(start, end);
-            const mergedTime = mergedPulls.mergedTimesPerPull();
+            const mergedTimeImage = new image_1.ImageMergedTime(mergedPulls);
             return {
                 startDate: start.toISOString(),
                 endDate: end.toISOString(),
@@ -69,10 +70,7 @@ class Analyzed {
                     merged: {
                         count: mergedPulls.count(),
                         averageTime: mergedPulls.mergedTimeAverage(),
-                        chart: {
-                            xaxis: `[${mergedTime.map((pull) => pull.number).join(',')}]`,
-                            bars: `[${mergedTime.map((pull) => pull.hours).join(',')}]`,
-                        },
+                        chart: new image_1.ImageMergedTime(mergedPulls).asMarmaidContents(),
                     },
                 },
             };
