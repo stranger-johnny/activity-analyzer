@@ -32,8 +32,11 @@ export class MergedPullsAnalyzer extends PullsAnalyzer {
     pulls: Pull[]
   }[] {
     const grouped = groupBy(this.pulls, (pull) => pull.user?.id ?? 'unknown')
-    return Object.entries(grouped).map(([userId, pulls]) => ({
-      user: { name: userId, avator: pulls[0]?.user?.avatar_url ?? '' },
+    return Object.entries(grouped).map(([_, pulls]) => ({
+      user: {
+        name: pulls[0]?.user?.login ?? '',
+        avator: pulls[0]?.user?.avatar_url ?? '',
+      },
       pulls,
     }))
   }
