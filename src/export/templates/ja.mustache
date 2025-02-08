@@ -9,8 +9,9 @@
 {{#merged}}
 
 ### Current Period ({{{current.start}}} ~ {{{current.end}}})
+{{#current}}
 #### マージされたPR数
-{{#count}}{{count}} issue{{/count}}
+{{#count}}{{count}} PRs{{/count}}
 
 {{#chart}}
 ```mermaid
@@ -19,12 +20,13 @@
 {{/chart}}
 {{/current}}
 {{^current}}
-期間内にマージされたPRがありませんでした。
+0 PRs
 {{/current}}
 
 ### Previous Period ({{{previous.start}}} ~ {{{previous.end}}})
 #### マージされたPR数
-{{#count}}{{count}} issue{{/count}}
+{{previous}}
+{{#count}}{{count}} Prs{{/count}}
 
 {{#chart}}
 ```mermaid
@@ -33,7 +35,7 @@
 {{/chart}}
 {{/previous}}
 {{^previous}}
-前の期間内にマージされたPRがありませんでした。
+0 PRs
 {{/previous}}
 
 {{/merged}}
