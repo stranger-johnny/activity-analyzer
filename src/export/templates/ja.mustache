@@ -17,7 +17,7 @@
 | ユーザー | マージされたPR数 | マージされたPR |
 | --- | --- | --- |
 {{#perUser}}
-| {{name}} | {{count}} PRs | {{#links}}{{{.}}}{{/links}} |
+| {{name}} | {{count}} PRs | {{#links}} {{index}}. {{{url}}} {{/links}} |
 {{/perUser}}
 
 {{/current}}

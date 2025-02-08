@@ -22,7 +22,7 @@ type AnalyzedTemplateAttributes = {
           avator: string
           name: string
           count: number
-          links: string[]
+          links: { index: number; url: string }[]
         }[]
       }
       previous: {
@@ -31,7 +31,7 @@ type AnalyzedTemplateAttributes = {
           avator: string
           name: string
           count: number
-          links: string[]
+          links: { index: number; url: string }[]
         }[]
       }
     }
@@ -84,8 +84,8 @@ export class ExportToIssue {
           avator: user.user.avator,
           name: user.user.name,
           count: user.pulls.length,
-          links: user.pulls.map((pull) => {
-            return `[${pull.title}](${pull.html_url})<br>`
+          links: user.pulls.map((pull, index) => {
+            return { index, url: `[${pull.title}](${pull.html_url})<br>` }
           }),
         })),
       }
@@ -102,8 +102,8 @@ export class ExportToIssue {
           avator: user.user.avator,
           name: user.user.name,
           count: user.pulls.length,
-          links: user.pulls.map((pull) => {
-            return `[${pull.title}](${pull.html_url})<br>`
+          links: user.pulls.map((pull, index) => {
+            return { index, url: `[${pull.title}](${pull.html_url})<br>` }
           }),
         })),
       }
