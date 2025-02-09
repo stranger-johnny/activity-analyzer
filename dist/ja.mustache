@@ -1,0 +1,27 @@
+# Activity Analyzer
+
+## 期間
+{{{current.start}}} ~ {{{current.end}}}
+
+{{#pulls}}
+## Pull Request
+
+{{#merged}}
+
+{{#current}}
+#### マージされたPR数（トータル）
+{{#count}}{{#current}}{{current}}{{/current}}{{^current}}0{{/current}} PRs (前の期間: {{#previous}}{{previous}}{{/previous}}{{^previous}}0{{/previous}} PRs){{/count}}
+
+#### マージされたPR数（ユーザーごと）
+
+| ユーザー | マージされたPR数 | マージされたPR |
+| --- | --- | --- |
+{{#perUser}}
+| {{name}} | {{#count}}{{current}} PRs (前の期間: {{previous}} PRs) {{/count}} | {{#links}} {{index}}. {{{url}}} {{/links}} |
+{{/perUser}}
+
+{{/current}}
+
+{{/merged}}
+
+{{/pulls}}

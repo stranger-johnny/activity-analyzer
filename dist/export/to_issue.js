@@ -16,7 +16,7 @@ class ExportToIssue {
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
-                title: 'Analyzed by issue template',
+                title: this.config.title,
                 body: this.convertToTemplate(this.templateAttributes()),
             });
         };

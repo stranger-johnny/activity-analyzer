@@ -1,0 +1,27 @@
+# Activity Analyzer
+
+## Period
+{{{current.start}}} ~ {{{current.end}}}
+
+{{#pulls}}
+## Pull Request
+
+{{#merged}}
+
+{{#current}}
+#### Total Merged PRs
+{{#count}}{{#current}}{{current}}{{/current}}{{^current}}0{{/current}} PRs (Previous Period: {{#previous}}{{previous}}{{/previous}}{{^previous}}0{{/previous}} PRs){{/count}}
+
+#### Merged PRs per User
+
+| User | Merged PRs | Merged PR Links |
+| --- | --- | --- |
+{{#perUser}}
+| {{name}} | {{#count}}{{current}} PRs (Previous Period: {{previous}} PRs) {{/count}} | {{#links}} {{index}}. {{{url}}} {{/links}} |
+{{/perUser}}
+
+{{/current}}
+
+{{/merged}}
+
+{{/pulls}}
