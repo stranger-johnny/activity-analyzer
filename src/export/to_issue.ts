@@ -46,6 +46,7 @@ export class ExportToIssue {
   ) {}
 
   public do = async (): Promise<void> => {
+    console.log(this.templateAttributes())
     await this.gitHubClient.octokit.issues.create({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
