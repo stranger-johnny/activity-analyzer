@@ -11,10 +11,10 @@ export declare class MergedPullsAnalyzer extends PullsAnalyzer {
     mergedPullPerUser(): {
         user: {
             name: string;
-            avator: string;
         };
         pulls: Pull[];
     }[];
+    findMergedPullByUser(userName: string): Pull[];
     private secondsToTime;
     private secondsToHour;
 }

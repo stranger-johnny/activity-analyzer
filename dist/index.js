@@ -52371,41 +52371,24 @@ class ExportToIssue {
             }
         };
         this.templateAttributes = () => {
-            const currentPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
+            const currentPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
+            const previousPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
+            const pullsPerUser = (() => {
+                return currentPulls.mergedPullPerUser().map((user) => {
+                    return {
                         name: user.user.name,
-                        count: user.pulls.length,
+                        count: {
+                            current: user.pulls.length,
+                            previous: previousPulls.findMergedPullByUser(user.user.name).length,
+                        },
                         links: user.pulls.map((pull, i) => {
                             return {
                                 index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
+                                url: `[${pull.title} #${pull.number}](${pull.html_url})<br>`,
                             };
                         }),
-                    })),
-                };
-            })();
-            const previousPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
-                        name: user.user.name,
-                        count: user.pulls.length,
-                        links: user.pulls.map((pull, i) => {
-                            return {
-                                index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
-                            };
-                        }),
-                    })),
-                };
+                    };
+                });
             })();
             return {
                 current: {
@@ -52418,8 +52401,11 @@ class ExportToIssue {
                 },
                 pulls: {
                     merged: {
-                        current: currentPulls,
-                        previous: previousPulls,
+                        count: {
+                            current: currentPulls.count(),
+                            previous: previousPulls.count(),
+                        },
+                        perUser: pullsPerUser,
                     },
                 },
             };
@@ -52508,10 +52494,16 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
         return Object.entries(grouped).map(([_, pulls]) => ({
             user: {
                 name: pulls[0]?.user?.login ?? '',
-                avator: pulls[0]?.user?.avatar_url ?? '',
             },
             pulls,
         }));
+    }
+    findMergedPullByUser(userName) {
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
+        const pulls = Object.values(grouped).find((group) => {
+            return group[0]?.user?.login === userName;
+        });
+        return pulls ?? [];
     }
     secondsToTime(seconds) {
         const days = Math.floor(seconds / (24 * 60 * 60));
