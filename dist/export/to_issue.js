@@ -13,6 +13,7 @@ class ExportToIssue {
         this.config = config;
         this.pulls = pulls;
         this.do = async () => {
+            console.log(this.templateAttributes());
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
