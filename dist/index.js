@@ -52349,7 +52349,6 @@ class ExportToIssue {
         this.config = config;
         this.pulls = pulls;
         this.do = async () => {
-            console.log(this.templateAttributes());
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
@@ -52363,11 +52362,11 @@ class ExportToIssue {
         this.template = () => {
             switch (this.config.lang) {
                 case 'en':
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "en.mustache", 'utf-8');
                 case 'ja':
-                    return (0, fs_1.readFileSync)('src/export/templates/ja.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "ja.mustache", 'utf-8');
                 default:
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "en.mustache", 'utf-8');
             }
         };
         this.templateAttributes = () => {
@@ -52376,10 +52375,10 @@ class ExportToIssue {
             const pullsPerUser = (() => {
                 return currentPulls.mergedPullPerUser().map((user) => {
                     return {
-                        name: user.user.name,
+                        name: user.userName,
                         count: {
                             current: user.pulls.length,
-                            previous: previousPulls.findMergedPullByUser(user.user.name).length,
+                            previous: previousPulls.findMergedPullByUser(user.userName).length,
                         },
                         links: user.pulls.map((pull, i) => {
                             return {
@@ -52492,9 +52491,7 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     mergedPullPerUser() {
         const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
         return Object.entries(grouped).map(([_, pulls]) => ({
-            user: {
-                name: pulls[0]?.user?.login ?? '',
-            },
+            userName: pulls[0]?.user?.login ?? '',
             pulls,
         }));
     }
@@ -52504,15 +52501,6 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
             return group[0]?.user?.login === userName;
         });
         return pulls ?? [];
-    }
-    secondsToTime(seconds) {
-        const days = Math.floor(seconds / (24 * 60 * 60));
-        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-        const minutes = Math.floor((seconds % (60 * 60)) / 60);
-        return { days, hours, minutes };
-    }
-    secondsToHour(seconds) {
-        return seconds / (60 * 60);
     }
 }
 exports.MergedPullsAnalyzer = MergedPullsAnalyzer;

@@ -34,11 +34,10 @@ export class ExportToIssue {
   ) {}
 
   public do = async (): Promise<void> => {
-    console.log(this.templateAttributes())
     await this.gitHubClient.octokit.issues.create({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
-      title: 'Analyzed by issue template',
+      title: this.config.title,
       body: this.convertToTemplate(this.templateAttributes()),
     })
   }
@@ -52,11 +51,11 @@ export class ExportToIssue {
   private template = (): string => {
     switch (this.config.lang) {
       case 'en':
-        return readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/en.mustache', 'utf-8')
       case 'ja':
-        return readFileSync('src/export/templates/ja.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/ja.mustache', 'utf-8')
       default:
-        return readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/en.mustache', 'utf-8')
     }
   }
 
@@ -72,10 +71,10 @@ export class ExportToIssue {
     const pullsPerUser = (() => {
       return currentPulls.mergedPullPerUser().map((user) => {
         return {
-          name: user.user.name,
+          name: user.userName,
           count: {
             current: user.pulls.length,
-            previous: previousPulls.findMergedPullByUser(user.user.name).length,
+            previous: previousPulls.findMergedPullByUser(user.userName).length,
           },
           links: user.pulls.map((pull, i) => {
             return {

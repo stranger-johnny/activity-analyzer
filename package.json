@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && ncc build dist/index.js"
+    "build": "tsc && ncc build dist/index.js --asset-builds "
   },
   "repository": {
     "type": "git",

@@ -5,7 +5,7 @@ export class MergedPerUserChart {
 
   public asMarmaidContents = (): string => {
     const mergedPullPerUser = this.pulls.mergedPullPerUser()
-    const xaxis = mergedPullPerUser.map((pull) => pull.user).join(',')
+    const xaxis = mergedPullPerUser.map((pull) => pull.userName).join(',')
     const bars = mergedPullPerUser.map((pull) => pull.pulls.length).join(',')
     return `
     xychart-beta
