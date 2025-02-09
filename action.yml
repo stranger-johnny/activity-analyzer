@@ -1,4 +1,4 @@
-name: My GitHub Action
+name: Activity Analyzer
 description: A simple GitHub Action written in TypeScript
 inputs:
   repo:
