@@ -30,21 +30,16 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     mergedPullPerUser() {
         const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
         return Object.entries(grouped).map(([_, pulls]) => ({
-            user: {
-                name: pulls[0]?.user?.login ?? '',
-                avator: pulls[0]?.user?.avatar_url ?? '',
-            },
+            userName: pulls[0]?.user?.login ?? '',
             pulls,
         }));
     }
-    secondsToTime(seconds) {
-        const days = Math.floor(seconds / (24 * 60 * 60));
-        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-        const minutes = Math.floor((seconds % (60 * 60)) / 60);
-        return { days, hours, minutes };
-    }
-    secondsToHour(seconds) {
-        return seconds / (60 * 60);
+    findMergedPullByUser(userName) {
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
+        const pulls = Object.values(grouped).find((group) => {
+            return group[0]?.user?.login === userName;
+        });
+        return pulls ?? [];
     }
 }
 exports.MergedPullsAnalyzer = MergedPullsAnalyzer;

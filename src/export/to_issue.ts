@@ -16,24 +16,12 @@ type AnalyzedTemplateAttributes = {
   }
   pulls: {
     merged: {
-      current: {
-        count: number
-        perUser: {
-          avator: string
-          name: string
-          count: number
-          links: { index: number; url: string }[]
-        }[]
-      }
-      previous: {
-        count: number
-        perUser: {
-          avator: string
-          name: string
-          count: number
-          links: { index: number; url: string }[]
-        }[]
-      }
+      count: { current: number; previous: number }
+      perUser: {
+        name: string
+        count: { current: number; previous: number }
+        links: { index: number; url: string }[]
+      }[]
     }
   }
 }
@@ -49,7 +37,7 @@ export class ExportToIssue {
     await this.gitHubClient.octokit.issues.create({
       owner: this.gitHubClient.owner,
       repo: this.gitHubClient.repo,
-      title: 'Analyzed by issue template',
+      title: this.config.title,
       body: this.convertToTemplate(this.templateAttributes()),
     })
   }
@@ -63,56 +51,39 @@ export class ExportToIssue {
   private template = (): string => {
     switch (this.config.lang) {
       case 'en':
-        return readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/en.mustache', 'utf-8')
       case 'ja':
-        return readFileSync('src/export/templates/ja.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/ja.mustache', 'utf-8')
       default:
-        return readFileSync('src/export/templates/en.mustache', 'utf-8')
+        return readFileSync(__dirname + '/templates/en.mustache', 'utf-8')
     }
   }
 
   private templateAttributes = (): AnalyzedTemplateAttributes => {
-    const currentPulls = (() => {
-      const mergedPulls = this.pulls.filtedMerged(
-        this.config.current.start,
-        this.config.current.end
-      )
-      const perUser = mergedPulls.mergedPullPerUser()
-      return {
-        count: mergedPulls.count(),
-        perUser: perUser.map((user) => ({
-          avator: user.user.avator,
-          name: user.user.name,
-          count: user.pulls.length,
+    const currentPulls = this.pulls.filtedMerged(
+      this.config.current.start,
+      this.config.current.end
+    )
+    const previousPulls = this.pulls.filtedMerged(
+      this.config.previous.start,
+      this.config.previous.end
+    )
+    const pullsPerUser = (() => {
+      return currentPulls.mergedPullPerUser().map((user) => {
+        return {
+          name: user.userName,
+          count: {
+            current: user.pulls.length,
+            previous: previousPulls.findMergedPullByUser(user.userName).length,
+          },
           links: user.pulls.map((pull, i) => {
             return {
               index: i + 1,
-              url: `[${pull.title}](${pull.html_url})<br>`,
+              url: `[${pull.title} #${pull.number}](${pull.html_url})<br>`,
             }
           }),
-        })),
-      }
-    })()
-    const previousPulls = (() => {
-      const mergedPulls = this.pulls.filtedMerged(
-        this.config.previous.start,
-        this.config.previous.end
-      )
-      const perUser = mergedPulls.mergedPullPerUser()
-      return {
-        count: mergedPulls.count(),
-        perUser: perUser.map((user) => ({
-          avator: user.user.avator,
-          name: user.user.name,
-          count: user.pulls.length,
-          links: user.pulls.map((pull, i) => {
-            return {
-              index: i + 1,
-              url: `[${pull.title}](${pull.html_url})<br>`,
-            }
-          }),
-        })),
-      }
+        }
+      })
     })()
     return {
       current: {
@@ -125,8 +96,11 @@ export class ExportToIssue {
       },
       pulls: {
         merged: {
-          current: currentPulls,
-          previous: previousPulls,
+          count: {
+            current: currentPulls.count(),
+            previous: previousPulls.count(),
+          },
+          perUser: pullsPerUser,
         },
       },
     }

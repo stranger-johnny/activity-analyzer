@@ -1,4 +1,4 @@
-import type { Pull, Time } from '@/types'
+import type { Pull } from '@/types'
 import { groupBy } from 'lodash'
 
 export class PullsAnalyzer {
@@ -28,27 +28,21 @@ export class MergedPullsAnalyzer extends PullsAnalyzer {
   }
 
   public mergedPullPerUser(): {
-    user: { name: string; avator: string }
+    userName: string
     pulls: Pull[]
   }[] {
     const grouped = groupBy(this.pulls, (pull) => pull.user?.id ?? 'unknown')
     return Object.entries(grouped).map(([_, pulls]) => ({
-      user: {
-        name: pulls[0]?.user?.login ?? '',
-        avator: pulls[0]?.user?.avatar_url ?? '',
-      },
+      userName: pulls[0]?.user?.login ?? '',
       pulls,
     }))
   }
 
-  private secondsToTime(seconds: number): Time {
-    const days = Math.floor(seconds / (24 * 60 * 60))
-    const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60))
-    const minutes = Math.floor((seconds % (60 * 60)) / 60)
-    return { days, hours, minutes }
-  }
-
-  private secondsToHour(seconds: number): number {
-    return seconds / (60 * 60)
+  public findMergedPullByUser(userName: string): Pull[] {
+    const grouped = groupBy(this.pulls, (pull) => pull.user?.id ?? 'unknown')
+    const pulls = Object.values(grouped).find((group) => {
+      return group[0]?.user?.login === userName
+    })
+    return pulls ?? []
   }
 }

@@ -1,12 +1,15 @@
 import { z } from 'zod';
 declare const ConfigSchema: z.ZodObject<{
     lang: z.ZodUnion<[z.ZodLiteral<"ja">, z.ZodLiteral<"en">]>;
+    title: z.ZodString;
     period: z.ZodUnion<[z.ZodLiteral<"last-1week">, z.ZodLiteral<"last-2week">]>;
 }, "strip", z.ZodTypeAny, {
     lang: "ja" | "en";
+    title: string;
     period: "last-1week" | "last-2week";
 }, {
     lang: "ja" | "en";
+    title: string;
     period: "last-1week" | "last-2week";
 }>;
 type Config = z.infer<typeof ConfigSchema>;

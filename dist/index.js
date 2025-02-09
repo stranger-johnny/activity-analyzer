@@ -52287,6 +52287,7 @@ const js_yaml_1 = __nccwpck_require__(4281);
 const zod_1 = __nccwpck_require__(4809);
 const ConfigSchema = zod_1.z.object({
     lang: zod_1.z.union([zod_1.z.literal('ja'), zod_1.z.literal('en')]),
+    title: zod_1.z.string(),
     period: zod_1.z.union([zod_1.z.literal('last-1week'), zod_1.z.literal('last-2week')]),
 });
 const loadInput = async (path) => {
@@ -52352,7 +52353,7 @@ class ExportToIssue {
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
-                title: 'Analyzed by issue template',
+                title: this.config.title,
                 body: this.convertToTemplate(this.templateAttributes()),
             });
         };
@@ -52362,49 +52363,32 @@ class ExportToIssue {
         this.template = () => {
             switch (this.config.lang) {
                 case 'en':
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "en.mustache", 'utf-8');
                 case 'ja':
-                    return (0, fs_1.readFileSync)('src/export/templates/ja.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "ja.mustache", 'utf-8');
                 default:
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__nccwpck_require__.ab + "en.mustache", 'utf-8');
             }
         };
         this.templateAttributes = () => {
-            const currentPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
-                        name: user.user.name,
-                        count: user.pulls.length,
+            const currentPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
+            const previousPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
+            const pullsPerUser = (() => {
+                return currentPulls.mergedPullPerUser().map((user) => {
+                    return {
+                        name: user.userName,
+                        count: {
+                            current: user.pulls.length,
+                            previous: previousPulls.findMergedPullByUser(user.userName).length,
+                        },
                         links: user.pulls.map((pull, i) => {
                             return {
                                 index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
+                                url: `[${pull.title} #${pull.number}](${pull.html_url})<br>`,
                             };
                         }),
-                    })),
-                };
-            })();
-            const previousPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
-                        name: user.user.name,
-                        count: user.pulls.length,
-                        links: user.pulls.map((pull, i) => {
-                            return {
-                                index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
-                            };
-                        }),
-                    })),
-                };
+                    };
+                });
             })();
             return {
                 current: {
@@ -52417,8 +52401,11 @@ class ExportToIssue {
                 },
                 pulls: {
                     merged: {
-                        current: currentPulls,
-                        previous: previousPulls,
+                        count: {
+                            current: currentPulls.count(),
+                            previous: previousPulls.count(),
+                        },
+                        perUser: pullsPerUser,
                     },
                 },
             };
@@ -52505,21 +52492,16 @@ class MergedPullsAnalyzer extends PullsAnalyzer {
     mergedPullPerUser() {
         const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
         return Object.entries(grouped).map(([_, pulls]) => ({
-            user: {
-                name: pulls[0]?.user?.login ?? '',
-                avator: pulls[0]?.user?.avatar_url ?? '',
-            },
+            userName: pulls[0]?.user?.login ?? '',
             pulls,
         }));
     }
-    secondsToTime(seconds) {
-        const days = Math.floor(seconds / (24 * 60 * 60));
-        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-        const minutes = Math.floor((seconds % (60 * 60)) / 60);
-        return { days, hours, minutes };
-    }
-    secondsToHour(seconds) {
-        return seconds / (60 * 60);
+    findMergedPullByUser(userName) {
+        const grouped = (0, lodash_1.groupBy)(this.pulls, (pull) => pull.user?.id ?? 'unknown');
+        const pulls = Object.values(grouped).find((group) => {
+            return group[0]?.user?.login === userName;
+        });
+        return pulls ?? [];
     }
 }
 exports.MergedPullsAnalyzer = MergedPullsAnalyzer;
@@ -52539,12 +52521,6 @@ class PullsClient {
         this.gitHubClient = gitHubClient;
     }
     async collect() {
-        const { data: events } = await this.gitHubClient.octokit.issues.listEvents({
-            owner: this.gitHubClient.owner,
-            repo: this.gitHubClient.repo,
-            issue_number: 2,
-        });
-        console.log(events);
         return await this.gitHubClient.octokit.paginate(this.gitHubClient.octokit.rest.pulls.list, {
             owner: this.gitHubClient.owner,
             repo: this.gitHubClient.repo,

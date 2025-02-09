@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 const ConfigSchema = z.object({
   lang: z.union([z.literal('ja'), z.literal('en')]),
+  title: z.string(),
   period: z.union([z.literal('last-1week'), z.literal('last-2week')]),
 })
 type Config = z.infer<typeof ConfigSchema>

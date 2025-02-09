@@ -16,7 +16,7 @@ class ExportToIssue {
             await this.gitHubClient.octokit.issues.create({
                 owner: this.gitHubClient.owner,
                 repo: this.gitHubClient.repo,
-                title: 'Analyzed by issue template',
+                title: this.config.title,
                 body: this.convertToTemplate(this.templateAttributes()),
             });
         };
@@ -26,49 +26,32 @@ class ExportToIssue {
         this.template = () => {
             switch (this.config.lang) {
                 case 'en':
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__dirname + '/templates/en.mustache', 'utf-8');
                 case 'ja':
-                    return (0, fs_1.readFileSync)('src/export/templates/ja.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__dirname + '/templates/ja.mustache', 'utf-8');
                 default:
-                    return (0, fs_1.readFileSync)('src/export/templates/en.mustache', 'utf-8');
+                    return (0, fs_1.readFileSync)(__dirname + '/templates/en.mustache', 'utf-8');
             }
         };
         this.templateAttributes = () => {
-            const currentPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
-                        name: user.user.name,
-                        count: user.pulls.length,
+            const currentPulls = this.pulls.filtedMerged(this.config.current.start, this.config.current.end);
+            const previousPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
+            const pullsPerUser = (() => {
+                return currentPulls.mergedPullPerUser().map((user) => {
+                    return {
+                        name: user.userName,
+                        count: {
+                            current: user.pulls.length,
+                            previous: previousPulls.findMergedPullByUser(user.userName).length,
+                        },
                         links: user.pulls.map((pull, i) => {
                             return {
                                 index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
+                                url: `[${pull.title} #${pull.number}](${pull.html_url})<br>`,
                             };
                         }),
-                    })),
-                };
-            })();
-            const previousPulls = (() => {
-                const mergedPulls = this.pulls.filtedMerged(this.config.previous.start, this.config.previous.end);
-                const perUser = mergedPulls.mergedPullPerUser();
-                return {
-                    count: mergedPulls.count(),
-                    perUser: perUser.map((user) => ({
-                        avator: user.user.avator,
-                        name: user.user.name,
-                        count: user.pulls.length,
-                        links: user.pulls.map((pull, i) => {
-                            return {
-                                index: i + 1,
-                                url: `[${pull.title}](${pull.html_url})<br>`,
-                            };
-                        }),
-                    })),
-                };
+                    };
+                });
             })();
             return {
                 current: {
@@ -81,8 +64,11 @@ class ExportToIssue {
                 },
                 pulls: {
                     merged: {
-                        current: currentPulls,
-                        previous: previousPulls,
+                        count: {
+                            current: currentPulls.count(),
+                            previous: previousPulls.count(),
+                        },
+                        perUser: pullsPerUser,
                     },
                 },
             };

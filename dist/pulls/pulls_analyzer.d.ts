@@ -9,12 +9,8 @@ export declare class PullsAnalyzer {
 export declare class MergedPullsAnalyzer extends PullsAnalyzer {
     constructor(pulls: Pull[]);
     mergedPullPerUser(): {
-        user: {
-            name: string;
-            avator: string;
-        };
+        userName: string;
         pulls: Pull[];
     }[];
-    private secondsToTime;
-    private secondsToHour;
+    findMergedPullByUser(userName: string): Pull[];
 }

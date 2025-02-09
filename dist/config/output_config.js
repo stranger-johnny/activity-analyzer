@@ -10,6 +10,7 @@ const js_yaml_1 = require("js-yaml");
 const zod_1 = require("zod");
 const ConfigSchema = zod_1.z.object({
     lang: zod_1.z.union([zod_1.z.literal('ja'), zod_1.z.literal('en')]),
+    title: zod_1.z.string(),
     period: zod_1.z.union([zod_1.z.literal('last-1week'), zod_1.z.literal('last-2week')]),
 });
 const loadInput = async (path) => {
